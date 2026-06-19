@@ -71,24 +71,7 @@ def complete_memo_data() -> dict:
             "catalyst": {"score": "weak", "weight": 0.05},
         },
         "reverse_dcf_expectations": None,
-        "valuation_range": {
-            "currency": "USD",
-            "downside": {
-                "name": "Downside",
-                "intrinsic_value_per_share": 80,
-                "assumptions": {"growth": "slows materially"},
-            },
-            "base": {
-                "name": "Base",
-                "intrinsic_value_per_share": 120,
-                "assumptions": {"growth": "normalizes"},
-            },
-            "upside": {
-                "name": "Upside",
-                "intrinsic_value_per_share": 160,
-                "assumptions": {"growth": "persists"},
-            },
-        },
+        "valuation_range": None,
         "monitoring_rules": [
             {
                 "metric": "Net revenue retention",
@@ -137,6 +120,7 @@ def test_stub_llm_response_parses_into_investment_memo() -> None:
     assert isinstance(memo, InvestmentMemo)
     assert memo.company_name == "Example Corp"
     assert memo.ticker == "EXM"
+    assert memo.valuation_range is None
     assert stub.prompts
 
 
@@ -157,3 +141,4 @@ def test_prompt_includes_reasoning_chain() -> None:
     assert "Return only valid JSON" in prompt
     assert "InvestmentMemo JSON schema" in prompt
     assert "Do not perform reverse DCF calculations" in prompt
+    assert "valuation_range to null" in prompt

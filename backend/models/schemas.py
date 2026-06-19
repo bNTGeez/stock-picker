@@ -166,7 +166,7 @@ class InvestmentMemo(StrictSchema):
     unknowns: UnknownsSection
     category_scores: CategoryScores
     reverse_dcf_expectations: ReverseDCFExpectations | None = None
-    valuation_range: ValuationRange
+    valuation_range: ValuationRange | None = None
     monitoring_rules: list[MonitoringRule] = Field(default_factory=list)
 
 

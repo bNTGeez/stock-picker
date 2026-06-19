@@ -92,6 +92,15 @@ def test_valid_complete_memo_construction() -> None:
     assert memo.category_scores.business_quality.weight == 0.30
 
 
+def test_valuation_range_can_be_omitted_for_research_only_memo() -> None:
+    data = complete_memo_data()
+    del data["valuation_range"]
+
+    memo = InvestmentMemo.model_validate(data)
+
+    assert memo.valuation_range is None
+
+
 def test_enum_validation_rejects_unknown_values() -> None:
     data = complete_memo_data()
     data["verdict"] = "maybe"

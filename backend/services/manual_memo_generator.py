@@ -111,8 +111,9 @@ Reflect the chain in the InvestmentMemo fields:
 - Investment Stance: stance and monitoring rules.
 
 Do not perform reverse DCF calculations. Set reverse_dcf_expectations to null
-unless explicit reverse DCF outputs are supplied in the manual inputs. Do not add
-an overall score.
+unless explicit reverse DCF outputs are supplied in the manual inputs. Set
+valuation_range to null unless explicit downside/base/upside valuation outputs
+are supplied in the manual inputs. Do not add an overall score.
 
 InvestmentMemo JSON schema:
 {memo_schema}
