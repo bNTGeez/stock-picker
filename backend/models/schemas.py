@@ -5,7 +5,7 @@ from enum import Enum
 import re
 from typing import ClassVar, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 _PROHIBITED_AGGREGATE_SCORE_PATTERNS: tuple[re.Pattern[str], ...] = (
@@ -130,10 +130,10 @@ class MemoEvidenceValidationStatus(str, Enum):
 class EvidenceItem(StrictSchema):
     """Source-backed evidence referenced by an observation."""
 
-    source: str = Field(..., min_length=1)
+    source_type: str = Field(..., min_length=1)
+    source_tier: int = Field(..., ge=1, le=4)
+    source_id: str = Field(..., min_length=1)
     quote: str = Field(..., min_length=1)
-    url: HttpUrl | None = None
-    published_date: date | None = None
     normalized_quote: str | None = Field(default=None, min_length=1)
     located_start_offset: int | None = Field(default=None, ge=0)
     located_end_offset: int | None = Field(default=None, ge=0)
@@ -163,15 +163,13 @@ class EvidenceItem(StrictSchema):
 class ObservationItem(StrictSchema):
     """Analytical observation supported by one or more evidence items."""
 
-    observation: str = Field(..., min_length=1)
-    analysis: str = Field(..., min_length=1)
-    evidence: list[EvidenceItem] = Field(..., min_length=1)
+    statement: str = Field(..., min_length=1)
+    supporting_evidence: list[EvidenceItem] = Field(..., min_length=1)
 
 
 class ObservationSection(StrictSchema):
-    """Named group of memo observations."""
+    """Memo observations."""
 
-    title: str = Field(..., min_length=1)
     observations: list[ObservationItem] = Field(..., min_length=1)
 
 
@@ -191,8 +189,7 @@ class AdversarialResearchSection(StrictSchema):
 class UnknownsSection(StrictSchema):
     """Known unknowns that remain after research."""
 
-    open_questions: list[str] = Field(..., min_length=1)
-    data_gaps: list[str] = Field(default_factory=list)
+    unknowns: list[str] = Field(..., min_length=1)
 
 
 class CategoryScore(StrictSchema):
@@ -304,7 +301,7 @@ class InvestmentMemo(StrictSchema):
     confidence: Confidence
     category_scores: CategoryScores
     market_expectations: str = Field(..., min_length=1)
-    observations: list[ObservationItem] = Field(..., min_length=1)
+    observations: ObservationSection
     variant_hypothesis: str = Field(..., min_length=1)
     why_consensus_may_be_wrong: str = Field(..., min_length=1)
     adversarial_research: AdversarialResearchSection

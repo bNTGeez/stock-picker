@@ -30,7 +30,9 @@ def source_documents() -> list[SourceDocument]:
 
 def test_exact_quote_match() -> None:
     evidence = EvidenceItem(
-        source="FY2026 Form 10-K",
+        source_type="10-K Item 1",
+        source_tier=1,
+        source_id="FY2026 Form 10-K",
         quote="Revenue grew as retention improved.",
     )
     document = SourceDocument(
@@ -48,7 +50,9 @@ def test_exact_quote_match() -> None:
 
 def test_whitespace_normalized_match() -> None:
     evidence = EvidenceItem(
-        source="FY2026 Form 10-K",
+        source_type="10-K Item 1",
+        source_tier=1,
+        source_id="FY2026 Form 10-K",
         quote="Revenue grew as retention improved.",
     )
     document = SourceDocument(
@@ -66,7 +70,9 @@ def test_whitespace_normalized_match() -> None:
 
 def test_fuzzy_accepted_match() -> None:
     evidence = EvidenceItem(
-        source="FY2026 Form 10-K",
+        source_type="10-K Item 1",
+        source_tier=1,
+        source_id="FY2026 Form 10-K",
         quote="Revenue grew as retentin improved.",
     )
     document = SourceDocument(
@@ -83,7 +89,9 @@ def test_fuzzy_accepted_match() -> None:
 
 def test_fuzzy_rejected_match() -> None:
     evidence = EvidenceItem(
-        source="FY2026 Form 10-K",
+        source_type="10-K Item 1",
+        source_tier=1,
+        source_id="FY2026 Form 10-K",
         quote="Revenue grew as retentin improved.",
     )
     document = SourceDocument(
@@ -97,7 +105,9 @@ def test_fuzzy_rejected_match() -> None:
 
 def test_fabricated_quote_rejection() -> None:
     evidence = EvidenceItem(
-        source="FY2026 Form 10-K",
+        source_type="10-K Item 1",
+        source_tier=1,
+        source_id="FY2026 Form 10-K",
         quote="Management announced a guaranteed margin expansion plan.",
     )
 
@@ -130,7 +140,12 @@ def test_high_similarity_material_changes_are_rejected(
     source_text: str,
     quote: str,
 ) -> None:
-    evidence = EvidenceItem(source="FY2026 Form 10-K", quote=quote)
+    evidence = EvidenceItem(
+        source_type="10-K Item 1",
+        source_tier=1,
+        source_id="FY2026 Form 10-K",
+        quote=quote,
+    )
     document = SourceDocument(source="FY2026 Form 10-K", text=source_text)
 
     with pytest.raises(EvidenceValidationError, match="could not be located"):
@@ -146,7 +161,7 @@ def test_valid_memo_receives_offsets_and_match_scores() -> None:
         threshold=0.95,
     )
 
-    observation_evidence = located.observations[0].evidence[0]
+    observation_evidence = located.observations.observations[0].supporting_evidence[0]
     assert observation_evidence.normalized_quote == (
         "Revenue grew as retention improved."
     )
@@ -165,7 +180,7 @@ def test_insufficient_evidence_can_be_represented_without_inventing_conviction()
     data["research_verdict"] = "Insufficient Evidence"
     data["investment_stance"] = "Neutral"
     data["confidence"] = "Low"
-    data["unknowns"]["data_gaps"].append("Only narrow excerpts were supplied.")
+    data["unknowns"]["unknowns"].append("Only narrow excerpts were supplied.")
     data["recommended_next_step"] = (
         "Collect more source material before forming a higher-conviction view."
     )
@@ -180,4 +195,7 @@ def test_insufficient_evidence_can_be_represented_without_inventing_conviction()
     assert located.research_verdict.value == "Insufficient Evidence"
     assert located.confidence.value == "Low"
     assert located.investment_stance.value == "Neutral"
-    assert located.observations[0].evidence[0].match_score == 1.0
+    assert (
+        located.observations.observations[0].supporting_evidence[0].match_score
+        == 1.0
+    )

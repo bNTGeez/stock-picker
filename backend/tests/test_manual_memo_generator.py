@@ -30,25 +30,26 @@ class StubLLM:
 
 def complete_memo_data() -> dict:
     evidence = {
-        "source": "FY2026 Form 10-K",
+        "source_type": "10-K Item 1",
+        "source_tier": 1,
+        "source_id": "FY2026 Form 10-K",
         "quote": "Revenue grew as retention improved.",
-        "url": "https://example.com/report",
-        "published_date": "2026-03-01",
     }
     transcript_evidence = {
-        "source": "Q1 2026 earnings call",
+        "source_type": "earnings_transcript",
+        "source_tier": 2,
+        "source_id": "Q1 2026 earnings call",
         "quote": "Management said retention remained strong.",
-        "published_date": "2026-05-01",
     }
     risk_evidence = {
-        "source": "FY2026 Form 10-K",
+        "source_type": "10-K Item 1A",
+        "source_tier": 1,
+        "source_id": "FY2026 Form 10-K",
         "quote": "A small number of customers represent a significant share of revenue.",
-        "published_date": "2026-03-01",
     }
     observation = {
-        "observation": "Retention is improving.",
-        "analysis": "Improving retention supports more durable revenue.",
-        "evidence": [evidence, transcript_evidence],
+        "statement": "Retention is improving.",
+        "supporting_evidence": [evidence, transcript_evidence],
     }
     monitoring_rule = {
         "trigger": "Retention remains above 110%.",
@@ -96,7 +97,7 @@ def complete_memo_data() -> dict:
             },
         },
         "market_expectations": "Consensus expects growth to normalize.",
-        "observations": [observation],
+        "observations": {"observations": [observation]},
         "variant_hypothesis": "Growth may be more durable than consensus expects.",
         "why_consensus_may_be_wrong": (
             "Consensus may be over-extrapolating near-term normalization and "
@@ -115,8 +116,10 @@ def complete_memo_data() -> dict:
             "final_synthesis": "The variant view deserves more research, not conviction yet.",
         },
         "unknowns": {
-            "open_questions": ["Can margins hold through a cycle?"],
-            "data_gaps": ["Segment-level retention history is incomplete."],
+            "unknowns": [
+                "Can margins hold through a cycle?",
+                "Segment-level retention history is incomplete.",
+            ],
         },
         "top_risks": ["Customer concentration", "Multiple compression"],
         "valuation_range": {
@@ -204,12 +207,18 @@ def test_stub_llm_response_parses_into_investment_memo() -> None:
     assert memo.research_verdict.value == "Research Further"
     assert memo.valuation_range.bull.label == "Bull"
     assert memo.reverse_dcf_expectations is None
-    assert memo.observations[0].evidence[0].normalized_quote == (
+    assert memo.observations.observations[0].supporting_evidence[0].normalized_quote == (
         "Revenue grew as retention improved."
     )
-    assert memo.observations[0].evidence[0].located_start_offset == 0
-    assert memo.observations[0].evidence[0].located_end_offset == 35
-    assert memo.observations[0].evidence[0].match_score == 1.0
+    assert (
+        memo.observations.observations[0].supporting_evidence[0].located_start_offset
+        == 0
+    )
+    assert (
+        memo.observations.observations[0].supporting_evidence[0].located_end_offset
+        == 35
+    )
+    assert memo.observations.observations[0].supporting_evidence[0].match_score == 1.0
     assert stub.prompts
 
 
@@ -225,7 +234,9 @@ def test_schema_invalid_json_fails_clearly() -> None:
 
 def test_unlocatable_evidence_fails_clearly() -> None:
     data = complete_memo_data()
-    data["observations"][0]["evidence"][0]["quote"] = "Fabricated growth proof."
+    data["observations"]["observations"][0]["supporting_evidence"][0][
+        "quote"
+    ] = "Fabricated growth proof."
 
     with pytest.raises(InvalidMemoEvidenceError, match="could not be located"):
         parse_investment_memo_response(

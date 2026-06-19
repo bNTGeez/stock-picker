@@ -113,8 +113,11 @@ Preserve this reasoning chain in the memo:
 {REASONING_CHAIN}
 
 Reflect the chain in the InvestmentMemo fields:
-- Evidence: source-backed EvidenceItem entries using the supplied excerpts.
-- Observations: observations supported by supplied EvidenceItem entries.
+- Evidence: source-backed EvidenceItem entries using source_type, source_tier,
+  source_id, and quotes copied from the supplied excerpts. Set source_id to the
+  supplied excerpt source value.
+- Observations: ObservationSection entries with statements supported by supplied
+  EvidenceItem entries.
 - Market Expectations: market_expectations must state what consensus notes and
   market-implied inputs appear to assume.
 - Variant Hypothesis: variant_hypothesis must explain the thesis that differs
@@ -141,8 +144,8 @@ or buy/sell recommendation.
 Every EvidenceItem quote must be copied from the supplied excerpts. Whitespace
 differences are acceptable, but fabricated or unlocatable quotes are invalid.
 Do not invent evidence when the supplied excerpts are insufficient; use
-research_verdict "Insufficient Evidence", confidence "Low", and explain the data
-gaps in unknowns. Leave normalized_quote, located_start_offset,
+research_verdict "Insufficient Evidence", confidence "Low", and explain the
+unknown facts in unknowns. Leave normalized_quote, located_start_offset,
 located_end_offset, and match_score null or omitted; the validator populates them.
 
 InvestmentMemo JSON schema:

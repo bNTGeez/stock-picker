@@ -282,11 +282,12 @@ def locate_evidence_item(
         raise ValueError("Evidence match threshold must be between 0 and 1")
 
     documents_by_name = _source_documents_by_name(source_documents)
-    normalized_source_name = normalize_whitespace(evidence.source)
+    normalized_source_name = normalize_whitespace(evidence.source_id)
     matching_documents = documents_by_name.get(normalized_source_name, [])
     if not matching_documents:
         raise EvidenceValidationError(
-            f"No supplied source text found for evidence source: {evidence.source}"
+            "No supplied source text found for evidence source_id: "
+            f"{evidence.source_id}"
         )
 
     normalized_quote = normalize_whitespace(evidence.quote)
@@ -306,13 +307,13 @@ def locate_evidence_item(
         score = 0.0 if best_match is None else best_match.score
         raise EvidenceValidationError(
             "Evidence quote could not be located above threshold "
-            f"{match_threshold:.2f} in source {evidence.source!r}; "
+            f"{match_threshold:.2f} in source_id {evidence.source_id!r}; "
             f"best score was {score:.3f}"
         )
 
     return evidence.model_copy(
         update={
-            "source": normalized_source_name,
+            "source_id": normalized_source_name,
             "normalized_quote": normalized_quote,
             "located_start_offset": best_match.start_offset,
             "located_end_offset": best_match.end_offset,
@@ -384,18 +385,21 @@ def validate_memo_evidence(
     if not source_documents:
         raise EvidenceValidationError("At least one source document is required")
 
-    observations = [
+    observation_items = [
         observation.model_copy(
             update={
-                "evidence": _validate_evidence_list(
-                    observation.evidence,
+                "supporting_evidence": _validate_evidence_list(
+                    observation.supporting_evidence,
                     source_documents=source_documents,
                     threshold=match_threshold,
                 )
             }
         )
-        for observation in memo.observations
+        for observation in memo.observations.observations
     ]
+    observations = memo.observations.model_copy(
+        update={"observations": observation_items}
+    )
 
     adversarial_research = memo.adversarial_research.model_copy(
         update={

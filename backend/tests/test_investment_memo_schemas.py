@@ -16,20 +16,20 @@ from backend.models.schemas import (
 
 def complete_memo_data() -> dict:
     evidence = {
-        "source": "FY2026 annual report",
+        "source_type": "10-K Item 1",
+        "source_tier": 1,
+        "source_id": "FY2026 annual report",
         "quote": "Revenue grew as retention improved.",
-        "url": "https://example.com/report",
-        "published_date": "2026-03-01",
     }
     risk_evidence = {
-        "source": "FY2026 annual report",
+        "source_type": "10-K Item 1A",
+        "source_tier": 1,
+        "source_id": "FY2026 annual report",
         "quote": "A small number of customers represent a significant share of revenue.",
-        "published_date": "2026-03-01",
     }
     observation = {
-        "observation": "Retention is improving.",
-        "analysis": "Improving retention supports more durable revenue.",
-        "evidence": [evidence],
+        "statement": "Retention is improving.",
+        "supporting_evidence": [evidence],
     }
     category_score = {
         "score": 76,
@@ -84,7 +84,7 @@ def complete_memo_data() -> dict:
             },
         },
         "market_expectations": "Consensus expects growth to normalize over the next year.",
-        "observations": [observation],
+        "observations": {"observations": [observation]},
         "variant_hypothesis": "Growth durability may be stronger than consensus expects.",
         "why_consensus_may_be_wrong": (
             "Consensus may extrapolate cyclical slowdown while retention data points "
@@ -103,8 +103,10 @@ def complete_memo_data() -> dict:
             "final_synthesis": "The variant view is plausible but still needs monitoring.",
         },
         "unknowns": {
-            "open_questions": ["Can margins hold through a cycle?"],
-            "data_gaps": ["Segment-level retention history is incomplete."],
+            "unknowns": [
+                "Can margins hold through a cycle?",
+                "Segment-level retention history is incomplete.",
+            ],
         },
         "top_risks": [
             "Customer concentration",
@@ -287,11 +289,11 @@ def test_overall_score_fields_are_not_allowed() -> None:
             "recommended_next_step",
         ),
         (
-            lambda data: data["observations"][0].__setitem__(
-                "analysis",
+            lambda data: data["observations"]["observations"][0].__setitem__(
+                "statement",
                 "The composite score is strong enough to continue.",
             ),
-            "observations[0].analysis",
+            "observations.observations[0].statement",
         ),
         (
             lambda data: data["top_risks"].__setitem__(
@@ -315,13 +317,36 @@ def test_overall_score_language_is_not_allowed_in_memo_text(
 
 def test_partial_evidence_location_metadata_is_rejected() -> None:
     data = {
-        "source": "FY2026 annual report",
+        "source_type": "10-K Item 1",
+        "source_tier": 1,
+        "source_id": "FY2026 annual report",
         "quote": "Revenue grew as retention improved.",
         "normalized_quote": "Revenue grew as retention improved.",
     }
 
     with pytest.raises(ValidationError):
         EvidenceItem.model_validate(data)
+
+
+def test_evidence_requires_tracked_source_fields() -> None:
+    data = {
+        "source_type": "10-K Item 1",
+        "source_tier": 1,
+        "source_id": "FY2026 annual report",
+        "quote": "Revenue grew as retention improved.",
+    }
+
+    item = EvidenceItem.model_validate(data)
+
+    assert item.source_type == "10-K Item 1"
+    assert item.source_tier == 1
+    assert item.source_id == "FY2026 annual report"
+
+    invalid_tier_data = deepcopy(data)
+    invalid_tier_data["source_tier"] = 5
+
+    with pytest.raises(ValidationError):
+        EvidenceItem.model_validate(invalid_tier_data)
 
 
 def test_full_adversarial_section_is_required() -> None:
