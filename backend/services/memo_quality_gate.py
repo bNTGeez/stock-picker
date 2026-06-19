@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+from collections import Counter
 from dataclasses import dataclass
+from typing import Sequence
 
 from backend.models.schemas import (
     ManualMemoQualityReview,
@@ -13,6 +15,8 @@ from backend.models.schemas import (
 
 MINIMUM_AVERAGE_SCORE = 4.0
 MINIMUM_CRITERION_SCORE = 3
+MINIMUM_PHASE_3_REVIEW_COUNT = 5
+MAXIMUM_PHASE_3_REVIEW_COUNT = 10
 
 PHASE_3_RUBRIC: dict[MemoQualityCriterion, str] = {
     MemoQualityCriterion.REAL_VARIANT_HYPOTHESIS: (
@@ -52,10 +56,21 @@ class MemoQualityGateResult:
     failing_reasons: tuple[str, ...]
 
 
-def evaluate_memo_quality_gate(
+@dataclass(frozen=True)
+class Phase3MemoQualityGateResult:
+    """Deterministic pass/fail result for the full Phase 3 review set."""
+
+    passed: bool
+    review_count: int
+    aggregate_average_score: float
+    review_results: tuple[MemoQualityGateResult, ...]
+    failing_reasons: tuple[str, ...]
+
+
+def evaluate_single_memo_quality_review(
     review: ManualMemoQualityReview,
 ) -> MemoQualityGateResult:
-    """Apply the Phase 3 manual rubric gate to reviewer-entered scores."""
+    """Apply the manual rubric thresholds to one reviewer-entered memo review."""
 
     criterion_scores = {
         criterion_score.criterion: criterion_score.score
@@ -95,11 +110,79 @@ def evaluate_memo_quality_gate(
     )
 
 
+def evaluate_memo_quality_gate(
+    reviews: Sequence[ManualMemoQualityReview],
+) -> Phase3MemoQualityGateResult:
+    """Apply the Phase 3 gate across the required 5-10 manual memo reviews."""
+
+    if isinstance(reviews, ManualMemoQualityReview):
+        raise TypeError(
+            "evaluate_memo_quality_gate expects a sequence of 5-10 manual "
+            "memo quality reviews; use evaluate_single_memo_quality_review "
+            "for one memo."
+        )
+
+    review_results = tuple(
+        evaluate_single_memo_quality_review(review) for review in reviews
+    )
+    review_count = len(review_results)
+    all_scores = [
+        score
+        for review_result in review_results
+        for score in review_result.criterion_scores.values()
+    ]
+    aggregate_average_score = (
+        sum(all_scores) / len(all_scores) if all_scores else 0.0
+    )
+
+    failing_reasons: list[str] = []
+    if review_count < MINIMUM_PHASE_3_REVIEW_COUNT:
+        failing_reasons.append(
+            "Phase 3 quality gate requires at least "
+            f"{MINIMUM_PHASE_3_REVIEW_COUNT} reviewed memos; got {review_count}."
+        )
+    if review_count > MAXIMUM_PHASE_3_REVIEW_COUNT:
+        failing_reasons.append(
+            "Phase 3 quality gate supports at most "
+            f"{MAXIMUM_PHASE_3_REVIEW_COUNT} reviewed memos; got {review_count}."
+        )
+
+    memo_identifier_counts = Counter(review.memo_identifier for review in reviews)
+    duplicate_memo_identifiers = sorted(
+        memo_identifier
+        for memo_identifier, count in memo_identifier_counts.items()
+        if count > 1
+    )
+    if duplicate_memo_identifiers:
+        failing_reasons.append(
+            "Phase 3 quality gate requires distinct memo identifiers; duplicates: "
+            f"{', '.join(duplicate_memo_identifiers)}."
+        )
+
+    for review, review_result in zip(reviews, review_results, strict=True):
+        if not review_result.passed:
+            failing_reasons.append(
+                f"{review.memo_identifier} failed manual memo quality review."
+            )
+
+    return Phase3MemoQualityGateResult(
+        passed=not failing_reasons,
+        review_count=review_count,
+        aggregate_average_score=aggregate_average_score,
+        review_results=review_results,
+        failing_reasons=tuple(failing_reasons),
+    )
+
+
 __all__ = [
+    "MAXIMUM_PHASE_3_REVIEW_COUNT",
     "MINIMUM_AVERAGE_SCORE",
     "MINIMUM_CRITERION_SCORE",
+    "MINIMUM_PHASE_3_REVIEW_COUNT",
     "MemoQualityGateResult",
     "PHASE_3_RUBRIC",
+    "Phase3MemoQualityGateResult",
     "QUALITATIVE_ONLY_CRITERIA_UNTIL_PHASE_4",
     "evaluate_memo_quality_gate",
+    "evaluate_single_memo_quality_review",
 ]
