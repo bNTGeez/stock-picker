@@ -42,6 +42,8 @@ yarn-error.log*
 
 # markdown notes/plans
 *.md
+!AI_Investment_Research_Analyst_Build_Phases.md
+!AI_Investment_Research_Analyst_Plan.md
 
 # vercel
 .vercel
