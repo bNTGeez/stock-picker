@@ -101,19 +101,29 @@ Preserve this reasoning chain in the memo:
 
 Reflect the chain in the InvestmentMemo fields:
 - Evidence: source-backed EvidenceItem entries using the supplied excerpts.
-- Observations: ObservationItem analysis grouped into observation_sections.
-- Market Expectations: what consensus notes and market-implied inputs appear to
-  assume; capture this in observation_sections and expectations_gap scoring.
-- Variant Hypothesis: the thesis that differs from those expectations.
-- Adversarial Research Reasoning: bear case, disconfirming evidence, unresolved
-  challenges, and unknowns.
-- Research Verdict: verdict and confidence.
-- Investment Stance: stance and monitoring rules.
+- Observations: observations supported by supplied EvidenceItem entries.
+- Market Expectations: market_expectations must state what consensus notes and
+  market-implied inputs appear to assume.
+- Variant Hypothesis: variant_hypothesis must explain the thesis that differs
+  from those expectations.
+- Why Consensus May Be Wrong: why_consensus_may_be_wrong must connect the
+  observations to the variant hypothesis.
+- Adversarial Research Reasoning: adversarial_research must include bull_case,
+  bear_case, key_disagreement, evidence_for_variant_view,
+  evidence_against_variant_view, rebuttal, disconfirming_evidence, and
+  final_synthesis.
+- Research Verdict: research_verdict and confidence must follow from the full
+  reasoning chain.
+- Investment Stance: investment_stance, top_risks, monitoring_rules, and
+  recommended_next_step must follow from the verdict without making a capital
+  allocation decision.
 
 Do not perform reverse DCF calculations. Set reverse_dcf_expectations to null
-unless explicit reverse DCF outputs are supplied in the manual inputs. Set
-valuation_range to null unless explicit downside/base/upside valuation outputs
-are supplied in the manual inputs. Do not add an overall score.
+unless explicit reverse DCF outputs are supplied in the manual inputs. Populate
+valuation_range with Bear, Base, and Bull scenarios using assumptions, implied
+outcomes, and supporting evidence from the supplied excerpts. Do not add an
+overall score, composite score, weighted aggregate, ranking signal, price target,
+or buy/sell recommendation.
 
 InvestmentMemo JSON schema:
 {memo_schema}

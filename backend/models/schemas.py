@@ -2,7 +2,7 @@
 
 from datetime import date
 from enum import Enum
-from typing import Any, ClassVar
+from typing import ClassVar, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
 
@@ -16,26 +16,30 @@ class StrictSchema(BaseModel):
 class ResearchVerdict(str, Enum):
     """Final research conclusion for a memo."""
 
-    INVESTABLE = "investable"
-    WATCHLIST = "watchlist"
-    PASS = "pass"
+    INSUFFICIENT_EVIDENCE = "Insufficient Evidence"
+    REJECT = "Reject"
+    WATCHLIST = "Watchlist"
+    RESEARCH_FURTHER = "Research Further"
+    CANDIDATE = "Candidate"
+    HIGH_CONVICTION_CANDIDATE = "High Conviction Candidate"
 
 
 class InvestmentStance(str, Enum):
-    """Portfolio action implied by the research."""
+    """Investment stance implied by the research."""
 
-    LONG = "long"
-    SHORT = "short"
-    AVOID = "avoid"
-    WATCH = "watch"
+    BEARISH = "Bearish"
+    LEAN_BEARISH = "Lean Bearish"
+    NEUTRAL = "Neutral"
+    LEAN_BULLISH = "Lean Bullish"
+    BULLISH = "Bullish"
 
 
 class Confidence(str, Enum):
     """Confidence level for the stated verdict."""
 
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
+    LOW = "Low"
+    MEDIUM = "Medium"
+    HIGH = "High"
 
 
 class EvidenceItem(StrictSchema):
@@ -63,11 +67,16 @@ class ObservationSection(StrictSchema):
 
 
 class AdversarialResearchSection(StrictSchema):
-    """Counter-thesis and disconfirming evidence for the memo."""
+    """Bull, bear, and disconfirming tests of the variant hypothesis."""
 
-    bear_case: list[ObservationItem] = Field(..., min_length=1)
-    disconfirming_evidence: list[EvidenceItem] = Field(default_factory=list)
-    unresolved_challenges: list[str] = Field(default_factory=list)
+    bull_case: str = Field(..., min_length=1)
+    bear_case: str = Field(..., min_length=1)
+    key_disagreement: str = Field(..., min_length=1)
+    evidence_for_variant_view: list[EvidenceItem] = Field(..., min_length=1)
+    evidence_against_variant_view: list[EvidenceItem] = Field(..., min_length=1)
+    rebuttal: str = Field(..., min_length=1)
+    disconfirming_evidence: list[str] = Field(..., min_length=1)
+    final_synthesis: str = Field(..., min_length=1)
 
 
 class UnknownsSection(StrictSchema):
@@ -80,8 +89,9 @@ class UnknownsSection(StrictSchema):
 class CategoryScore(StrictSchema):
     """Non-aggregate score label for one research category."""
 
-    score: str = Field(..., min_length=1)
+    score: int = Field(..., ge=0, le=100)
     weight: float = Field(..., ge=0, le=1)
+    rationale: str = Field(..., min_length=1)
 
 
 class CategoryScores(StrictSchema):
@@ -107,7 +117,7 @@ class CategoryScores(StrictSchema):
     def enforce_fixed_weights(self) -> "CategoryScores":
         for category, expected_weight in self.FIXED_WEIGHTS.items():
             score = getattr(self, category)
-            if score.weight != expected_weight:
+            if abs(score.weight - expected_weight) > 1e-9:
                 raise ValueError(
                     f"{category} weight must be {expected_weight:.2f}"
                 )
@@ -117,38 +127,61 @@ class CategoryScores(StrictSchema):
 class ReverseDCFExpectations(StrictSchema):
     """Expectations implied by market price from a reverse DCF analysis."""
 
-    implied_revenue_growth: float | None = None
-    implied_operating_margin: float | None = None
-    implied_free_cash_flow_margin: float | None = None
-    implied_terminal_growth: float | None = None
-    implied_discount_rate: float | None = None
+    implied_revenue_cagr_low: float
+    implied_revenue_cagr_mid: float
+    implied_revenue_cagr_high: float
+    implied_fcf_margin_low: float
+    implied_fcf_margin_mid: float
+    implied_fcf_margin_high: float
     notes: str | None = None
 
 
 class ValuationScenario(StrictSchema):
-    """Single valuation case with explicit assumptions."""
+    """Single Bear/Base/Bull valuation case with explicit assumptions."""
 
-    name: str = Field(..., min_length=1)
-    intrinsic_value_per_share: float = Field(..., ge=0)
-    assumptions: dict[str, Any] = Field(default_factory=dict)
+    label: Literal["Bear", "Base", "Bull"]
+    assumptions: list[str] = Field(..., min_length=1)
+    implied_outcome: str = Field(..., min_length=1)
+    supporting_evidence: list[EvidenceItem] = Field(..., min_length=1)
 
 
 class ValuationRange(StrictSchema):
-    """Downside/base/upside valuation cases for the memo."""
+    """Bear/Base/Bull valuation range for the memo."""
 
-    currency: str = Field(..., min_length=1, max_length=3)
-    downside: ValuationScenario
+    bear: ValuationScenario
     base: ValuationScenario
-    upside: ValuationScenario
+    bull: ValuationScenario
+
+    @model_validator(mode="after")
+    def enforce_scenario_labels(self) -> "ValuationRange":
+        expected_labels = {
+            "bear": "Bear",
+            "base": "Base",
+            "bull": "Bull",
+        }
+        for field_name, expected_label in expected_labels.items():
+            scenario = getattr(self, field_name)
+            if scenario.label != expected_label:
+                raise ValueError(
+                    f"{field_name} scenario label must be {expected_label}"
+                )
+        return self
 
 
 class MonitoringRule(StrictSchema):
     """Rule for tracking thesis drift after memo publication."""
 
-    metric: str = Field(..., min_length=1)
-    condition: str = Field(..., min_length=1)
-    threshold: str = Field(..., min_length=1)
-    action: str = Field(..., min_length=1)
+    trigger: str = Field(..., min_length=1)
+    rationale: str = Field(..., min_length=1)
+    evidence: list[EvidenceItem] = Field(default_factory=list)
+
+
+class MonitoringRules(StrictSchema):
+    """Green, yellow, and red thesis monitoring triggers."""
+
+    green_flags: list[MonitoringRule] = Field(..., min_length=1)
+    yellow_flags: list[MonitoringRule] = Field(..., min_length=1)
+    red_flags: list[MonitoringRule] = Field(..., min_length=1)
 
 
 class InvestmentMemo(StrictSchema):
@@ -157,17 +190,21 @@ class InvestmentMemo(StrictSchema):
     company_name: str = Field(..., min_length=1)
     ticker: str = Field(..., min_length=1)
     memo_date: date
-    verdict: ResearchVerdict
-    stance: InvestmentStance
+    research_verdict: ResearchVerdict
+    investment_stance: InvestmentStance
     confidence: Confidence
-    thesis: str = Field(..., min_length=1)
-    observation_sections: list[ObservationSection] = Field(..., min_length=1)
+    category_scores: CategoryScores
+    market_expectations: str = Field(..., min_length=1)
+    observations: list[ObservationItem] = Field(..., min_length=1)
+    variant_hypothesis: str = Field(..., min_length=1)
+    why_consensus_may_be_wrong: str = Field(..., min_length=1)
     adversarial_research: AdversarialResearchSection
     unknowns: UnknownsSection
-    category_scores: CategoryScores
-    reverse_dcf_expectations: ReverseDCFExpectations | None = None
-    valuation_range: ValuationRange | None = None
-    monitoring_rules: list[MonitoringRule] = Field(default_factory=list)
+    top_risks: list[str] = Field(..., min_length=1)
+    valuation_range: ValuationRange
+    reverse_dcf_expectations: ReverseDCFExpectations | None
+    monitoring_rules: MonitoringRules
+    recommended_next_step: str = Field(..., min_length=1)
 
 
 __all__ = [
@@ -179,6 +216,7 @@ __all__ = [
     "InvestmentMemo",
     "InvestmentStance",
     "MonitoringRule",
+    "MonitoringRules",
     "ObservationItem",
     "ObservationSection",
     "ResearchVerdict",

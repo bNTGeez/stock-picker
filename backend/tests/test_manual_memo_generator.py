@@ -33,9 +33,24 @@ def complete_memo_data() -> dict:
         "url": "https://example.com/report",
         "published_date": "2026-03-01",
     }
+    transcript_evidence = {
+        "source": "Q1 2026 earnings call",
+        "quote": "Management said retention remained strong.",
+        "published_date": "2026-05-01",
+    }
+    risk_evidence = {
+        "source": "FY2026 Form 10-K",
+        "quote": "A small number of customers represent a significant share of revenue.",
+        "published_date": "2026-03-01",
+    }
     observation = {
         "observation": "Retention is improving.",
         "analysis": "Improving retention supports more durable revenue.",
+        "evidence": [evidence, transcript_evidence],
+    }
+    monitoring_rule = {
+        "trigger": "Retention remains above 110%.",
+        "rationale": "Sustained retention would strengthen the durability thesis.",
         "evidence": [evidence],
     }
 
@@ -43,43 +58,104 @@ def complete_memo_data() -> dict:
         "company_name": "Example Corp",
         "ticker": "EXM",
         "memo_date": "2026-06-18",
-        "verdict": "investable",
-        "stance": "long",
-        "confidence": "medium",
-        "thesis": "The market underestimates the durability of growth.",
-        "observation_sections": [
-            {
-                "title": "Evidence and observations",
-                "observations": [observation],
-            }
-        ],
+        "research_verdict": "Research Further",
+        "investment_stance": "Neutral",
+        "confidence": "Medium",
+        "category_scores": {
+            "business_quality": {
+                "score": 78,
+                "weight": 0.30,
+                "rationale": "Retention improvement supports business quality.",
+            },
+            "risk_profile": {
+                "score": 52,
+                "weight": 0.20,
+                "rationale": "Customer concentration remains a material risk.",
+            },
+            "expectations_gap": {
+                "score": 70,
+                "weight": 0.20,
+                "rationale": "Consensus expects normalization despite retention evidence.",
+            },
+            "variant_perception": {
+                "score": 68,
+                "weight": 0.15,
+                "rationale": "The variant view is plausible but still incomplete.",
+            },
+            "valuation": {
+                "score": 60,
+                "weight": 0.10,
+                "rationale": "The valuation range is not enough without reverse DCF work.",
+            },
+            "catalyst": {
+                "score": 50,
+                "weight": 0.05,
+                "rationale": "More disclosures are needed to force convergence.",
+            },
+        },
+        "market_expectations": "Consensus expects growth to normalize.",
+        "observations": [observation],
+        "variant_hypothesis": "Growth may be more durable than consensus expects.",
+        "why_consensus_may_be_wrong": (
+            "Consensus may be over-extrapolating near-term normalization and "
+            "underweighting retention evidence."
+        ),
         "adversarial_research": {
-            "bear_case": [observation],
-            "disconfirming_evidence": [evidence],
-            "unresolved_challenges": ["Customer concentration remains unclear."],
+            "bull_case": "Retention improvement supports durable revenue growth.",
+            "bear_case": "Customer concentration could offset retention gains.",
+            "key_disagreement": "Whether retention durability offsets concentration risk.",
+            "evidence_for_variant_view": [evidence, transcript_evidence],
+            "evidence_against_variant_view": [risk_evidence],
+            "rebuttal": "Retention evidence is current, but concentration still needs sizing.",
+            "disconfirming_evidence": [
+                "Retention below 100% or weaker renewal disclosures."
+            ],
+            "final_synthesis": "The variant view deserves more research, not conviction yet.",
         },
         "unknowns": {
             "open_questions": ["Can margins hold through a cycle?"],
             "data_gaps": ["Segment-level retention history is incomplete."],
         },
-        "category_scores": {
-            "business_quality": {"score": "strong", "weight": 0.30},
-            "risk_profile": {"score": "medium", "weight": 0.20},
-            "expectations_gap": {"score": "strong", "weight": 0.20},
-            "variant_perception": {"score": "medium", "weight": 0.15},
-            "valuation": {"score": "medium", "weight": 0.10},
-            "catalyst": {"score": "weak", "weight": 0.05},
+        "top_risks": ["Customer concentration", "Multiple compression"],
+        "valuation_range": {
+            "bear": {
+                "label": "Bear",
+                "assumptions": ["Retention falls below 100%."],
+                "implied_outcome": "Growth slows and the valuation case weakens.",
+                "supporting_evidence": [risk_evidence],
+            },
+            "base": {
+                "label": "Base",
+                "assumptions": ["Retention remains above peer levels."],
+                "implied_outcome": "Durable growth supports a mid-range outcome.",
+                "supporting_evidence": [evidence],
+            },
+            "bull": {
+                "label": "Bull",
+                "assumptions": ["Retention remains strong and margins expand."],
+                "implied_outcome": "Growth durability supports upside to expectations.",
+                "supporting_evidence": [evidence, transcript_evidence],
+            },
         },
         "reverse_dcf_expectations": None,
-        "valuation_range": None,
-        "monitoring_rules": [
-            {
-                "metric": "Net revenue retention",
-                "condition": "falls below",
-                "threshold": "110%",
-                "action": "Revisit durability thesis.",
-            }
-        ],
+        "monitoring_rules": {
+            "green_flags": [monitoring_rule],
+            "yellow_flags": [
+                {
+                    "trigger": "Retention slips but remains above 100%.",
+                    "rationale": "This would require closer monitoring.",
+                    "evidence": [],
+                }
+            ],
+            "red_flags": [
+                {
+                    "trigger": "Retention falls below 100%.",
+                    "rationale": "This would materially damage the variant view.",
+                    "evidence": [],
+                }
+            ],
+        },
+        "recommended_next_step": "Research further before any capital allocation decision.",
     }
 
 
@@ -120,7 +196,9 @@ def test_stub_llm_response_parses_into_investment_memo() -> None:
     assert isinstance(memo, InvestmentMemo)
     assert memo.company_name == "Example Corp"
     assert memo.ticker == "EXM"
-    assert memo.valuation_range is None
+    assert memo.research_verdict.value == "Research Further"
+    assert memo.valuation_range.bull.label == "Bull"
+    assert memo.reverse_dcf_expectations is None
     assert stub.prompts
 
 
@@ -134,11 +212,21 @@ def test_schema_invalid_json_fails_clearly() -> None:
         parse_investment_memo_response(json.dumps({"company_name": "Example Corp"}))
 
 
-def test_prompt_includes_reasoning_chain() -> None:
+def test_prompt_includes_corrected_schema_and_reasoning_chain() -> None:
     prompt = build_manual_memo_prompt(manual_request())
 
     assert REASONING_CHAIN in prompt
     assert "Return only valid JSON" in prompt
     assert "InvestmentMemo JSON schema" in prompt
+    assert "research_verdict" in prompt
+    assert "investment_stance" in prompt
+    assert "market_expectations" in prompt
+    assert "variant_hypothesis" in prompt
+    assert "why_consensus_may_be_wrong" in prompt
+    assert "evidence_for_variant_view" in prompt
+    assert "evidence_against_variant_view" in prompt
+    assert "final_synthesis" in prompt
+    assert "Bear, Base, and Bull" in prompt
     assert "Do not perform reverse DCF calculations" in prompt
-    assert "valuation_range to null" in prompt
+    assert "reverse_dcf_expectations to null" in prompt
+    assert "overall score" in prompt
