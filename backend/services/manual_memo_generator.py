@@ -3,12 +3,18 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Sequence
 from datetime import date
 from typing import Protocol
 
 from pydantic import Field, ValidationError
 
 from backend.models.schemas import InvestmentMemo, StrictSchema
+from backend.services.evidence_validator import (
+    EvidenceValidationError,
+    SourceDocument,
+    validate_memo_evidence,
+)
 
 
 REASONING_CHAIN = (
@@ -27,6 +33,10 @@ class InvalidMemoJSONError(ManualMemoGenerationError):
 
 class InvalidMemoSchemaError(ManualMemoGenerationError):
     """Raised when the LLM response does not match InvestmentMemo."""
+
+
+class InvalidMemoEvidenceError(ManualMemoGenerationError):
+    """Raised when memo evidence cannot be located in supplied sources."""
 
 
 class ManualMemoLLM(Protocol):
@@ -78,7 +88,10 @@ class ManualMemoGenerator:
     def generate(self, request: ManualMemoRequest) -> InvestmentMemo:
         prompt = build_manual_memo_prompt(request)
         response = self._llm.generate(prompt)
-        return parse_investment_memo_response(response)
+        return parse_investment_memo_response(
+            response,
+            source_documents=source_documents_from_request(request),
+        )
 
 
 def build_manual_memo_prompt(request: ManualMemoRequest) -> str:
@@ -125,6 +138,13 @@ outcomes, and supporting evidence from the supplied excerpts. Do not add an
 overall score, composite score, weighted aggregate, ranking signal, price target,
 or buy/sell recommendation.
 
+Every EvidenceItem quote must be copied from the supplied excerpts. Whitespace
+differences are acceptable, but fabricated or unlocatable quotes are invalid.
+Do not invent evidence when the supplied excerpts are insufficient; use
+research_verdict "Insufficient Evidence", confidence "Low", and explain the data
+gaps in unknowns. Leave normalized_quote, located_start_offset,
+located_end_offset, and match_score null or omitted; the validator populates them.
+
 InvestmentMemo JSON schema:
 {memo_schema}
 
@@ -133,7 +153,25 @@ Manual inputs:
 """
 
 
-def parse_investment_memo_response(response: str) -> InvestmentMemo:
+def source_documents_from_request(request: ManualMemoRequest) -> list[SourceDocument]:
+    """Convert manual request excerpts into evidence validator source documents."""
+
+    excerpts = [*request.ten_k_excerpts, *request.transcript_excerpts]
+    return [
+        SourceDocument(
+            source=excerpt.source,
+            text=excerpt.text,
+            published_date=excerpt.published_date,
+        )
+        for excerpt in excerpts
+    ]
+
+
+def parse_investment_memo_response(
+    response: str,
+    source_documents: Sequence[SourceDocument] | None = None,
+    quote_match_threshold: float | None = None,
+) -> InvestmentMemo:
     """Parse an LLM response into InvestmentMemo with clear failure modes."""
 
     try:
@@ -145,16 +183,29 @@ def parse_investment_memo_response(response: str) -> InvestmentMemo:
         ) from error
 
     try:
-        return InvestmentMemo.model_validate(payload)
+        memo = InvestmentMemo.model_validate(payload)
     except ValidationError as error:
         raise InvalidMemoSchemaError(
             "LLM response did not match InvestmentMemo schema: "
             f"{error.errors(include_url=False)}"
         ) from error
 
+    if source_documents is None:
+        return memo
+
+    try:
+        return validate_memo_evidence(
+            memo,
+            source_documents=source_documents,
+            threshold=quote_match_threshold,
+        )
+    except EvidenceValidationError as error:
+        raise InvalidMemoEvidenceError(str(error)) from error
+
 
 __all__ = [
     "CompanyMetadata",
+    "InvalidMemoEvidenceError",
     "InvalidMemoJSONError",
     "InvalidMemoSchemaError",
     "ManualMemoGenerationError",
@@ -165,4 +216,5 @@ __all__ = [
     "REASONING_CHAIN",
     "build_manual_memo_prompt",
     "parse_investment_memo_response",
+    "source_documents_from_request",
 ]

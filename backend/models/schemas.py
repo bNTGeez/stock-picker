@@ -49,6 +49,30 @@ class EvidenceItem(StrictSchema):
     quote: str = Field(..., min_length=1)
     url: HttpUrl | None = None
     published_date: date | None = None
+    normalized_quote: str | None = Field(default=None, min_length=1)
+    located_start_offset: int | None = Field(default=None, ge=0)
+    located_end_offset: int | None = Field(default=None, ge=0)
+    match_score: float | None = Field(default=None, ge=0, le=1)
+
+    @model_validator(mode="after")
+    def validate_location_metadata(self) -> "EvidenceItem":
+        location_values = (
+            self.normalized_quote,
+            self.located_start_offset,
+            self.located_end_offset,
+            self.match_score,
+        )
+        if any(value is not None for value in location_values):
+            if any(value is None for value in location_values):
+                raise ValueError(
+                    "Evidence location metadata must be populated together"
+                )
+            if self.located_end_offset <= self.located_start_offset:
+                raise ValueError(
+                    "Evidence located_end_offset must be greater than "
+                    "located_start_offset"
+                )
+        return self
 
 
 class ObservationItem(StrictSchema):

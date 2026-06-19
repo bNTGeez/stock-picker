@@ -5,6 +5,7 @@ import pytest
 from backend.models.schemas import InvestmentMemo
 from backend.services.manual_memo_generator import (
     CompanyMetadata,
+    InvalidMemoEvidenceError,
     InvalidMemoJSONError,
     InvalidMemoSchemaError,
     ManualMemoGenerator,
@@ -13,6 +14,7 @@ from backend.services.manual_memo_generator import (
     REASONING_CHAIN,
     build_manual_memo_prompt,
     parse_investment_memo_response,
+    source_documents_from_request,
 )
 
 
@@ -172,7 +174,10 @@ def manual_request() -> ManualMemoRequest:
             ManualSourceExcerpt(
                 source="FY2026 Form 10-K",
                 section="Business",
-                text="Revenue grew as retention improved.",
+                text=(
+                    "Revenue grew as retention improved. A small number of "
+                    "customers represent a significant share of revenue."
+                ),
                 published_date="2026-03-01",
             )
         ],
@@ -199,6 +204,12 @@ def test_stub_llm_response_parses_into_investment_memo() -> None:
     assert memo.research_verdict.value == "Research Further"
     assert memo.valuation_range.bull.label == "Bull"
     assert memo.reverse_dcf_expectations is None
+    assert memo.observations[0].evidence[0].normalized_quote == (
+        "Revenue grew as retention improved."
+    )
+    assert memo.observations[0].evidence[0].located_start_offset == 0
+    assert memo.observations[0].evidence[0].located_end_offset == 35
+    assert memo.observations[0].evidence[0].match_score == 1.0
     assert stub.prompts
 
 
@@ -210,6 +221,17 @@ def test_invalid_json_fails_clearly() -> None:
 def test_schema_invalid_json_fails_clearly() -> None:
     with pytest.raises(InvalidMemoSchemaError, match="InvestmentMemo schema"):
         parse_investment_memo_response(json.dumps({"company_name": "Example Corp"}))
+
+
+def test_unlocatable_evidence_fails_clearly() -> None:
+    data = complete_memo_data()
+    data["observations"][0]["evidence"][0]["quote"] = "Fabricated growth proof."
+
+    with pytest.raises(InvalidMemoEvidenceError, match="could not be located"):
+        parse_investment_memo_response(
+            json.dumps(data),
+            source_documents=source_documents_from_request(manual_request()),
+        )
 
 
 def test_prompt_includes_corrected_schema_and_reasoning_chain() -> None:
@@ -230,3 +252,7 @@ def test_prompt_includes_corrected_schema_and_reasoning_chain() -> None:
     assert "Do not perform reverse DCF calculations" in prompt
     assert "reverse_dcf_expectations to null" in prompt
     assert "overall score" in prompt
+    assert "composite score" in prompt
+    assert "weighted aggregate" in prompt
+    assert "fabricated or unlocatable quotes are invalid" in prompt
+    assert "Insufficient Evidence" in prompt

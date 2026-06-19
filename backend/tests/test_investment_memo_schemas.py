@@ -6,6 +6,7 @@ from pydantic import ValidationError
 from backend.models.schemas import (
     AdversarialResearchSection,
     CategoryScore,
+    EvidenceItem,
     InvestmentMemo,
     InvestmentStance,
     ResearchVerdict,
@@ -244,17 +245,38 @@ def test_category_score_requires_numeric_score_and_rationale() -> None:
 
 
 def test_overall_score_fields_are_not_allowed() -> None:
-    data = complete_memo_data()
-    data["overall_score"] = 87
+    for field_name in (
+        "overall_score",
+        "composite_score",
+        "weighted_aggregate_score",
+    ):
+        data = complete_memo_data()
+        data[field_name] = 87
+
+        with pytest.raises(ValidationError):
+            InvestmentMemo.model_validate(data)
+
+    for field_name in (
+        "overall_score",
+        "composite_score",
+        "weighted_aggregate_score",
+    ):
+        data = complete_memo_data()
+        data["category_scores"][field_name] = 87
+
+        with pytest.raises(ValidationError):
+            InvestmentMemo.model_validate(data)
+
+
+def test_partial_evidence_location_metadata_is_rejected() -> None:
+    data = {
+        "source": "FY2026 annual report",
+        "quote": "Revenue grew as retention improved.",
+        "normalized_quote": "Revenue grew as retention improved.",
+    }
 
     with pytest.raises(ValidationError):
-        InvestmentMemo.model_validate(data)
-
-    data = complete_memo_data()
-    data["category_scores"]["overall_score"] = 87
-
-    with pytest.raises(ValidationError):
-        InvestmentMemo.model_validate(data)
+        EvidenceItem.model_validate(data)
 
 
 def test_full_adversarial_section_is_required() -> None:

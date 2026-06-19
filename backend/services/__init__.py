@@ -2,6 +2,7 @@
 
 from backend.services.manual_memo_generator import (
     CompanyMetadata,
+    InvalidMemoEvidenceError,
     InvalidMemoJSONError,
     InvalidMemoSchemaError,
     ManualMemoGenerationError,
@@ -12,10 +13,12 @@ from backend.services.manual_memo_generator import (
     REASONING_CHAIN,
     build_manual_memo_prompt,
     parse_investment_memo_response,
+    source_documents_from_request,
 )
 
 __all__ = [
     "CompanyMetadata",
+    "InvalidMemoEvidenceError",
     "InvalidMemoJSONError",
     "InvalidMemoSchemaError",
     "ManualMemoGenerationError",
@@ -26,4 +29,5 @@ __all__ = [
     "REASONING_CHAIN",
     "build_manual_memo_prompt",
     "parse_investment_memo_response",
+    "source_documents_from_request",
 ]
