@@ -1,4 +1,5 @@
 from copy import deepcopy
+import re
 
 import pytest
 from pydantic import ValidationError
@@ -266,6 +267,50 @@ def test_overall_score_fields_are_not_allowed() -> None:
 
         with pytest.raises(ValidationError):
             InvestmentMemo.model_validate(data)
+
+
+@pytest.mark.parametrize(
+    ("mutate", "expected_path"),
+    [
+        (
+            lambda data: data["category_scores"]["business_quality"].__setitem__(
+                "rationale",
+                "Overall score: 87.",
+            ),
+            "category_scores.business_quality.rationale",
+        ),
+        (
+            lambda data: data.__setitem__(
+                "recommended_next_step",
+                "Research further because the weighted aggregate is 82.",
+            ),
+            "recommended_next_step",
+        ),
+        (
+            lambda data: data["observations"][0].__setitem__(
+                "analysis",
+                "The composite score is strong enough to continue.",
+            ),
+            "observations[0].analysis",
+        ),
+        (
+            lambda data: data["top_risks"].__setitem__(
+                0,
+                "The memo includes a single overall ranking signal.",
+            ),
+            "top_risks[0]",
+        ),
+    ],
+)
+def test_overall_score_language_is_not_allowed_in_memo_text(
+    mutate,
+    expected_path: str,
+) -> None:
+    data = complete_memo_data()
+    mutate(data)
+
+    with pytest.raises(ValidationError, match=re.escape(expected_path)):
+        InvestmentMemo.model_validate(data)
 
 
 def test_partial_evidence_location_metadata_is_rejected() -> None:

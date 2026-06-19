@@ -2,9 +2,73 @@
 
 from datetime import date
 from enum import Enum
+import re
 from typing import ClassVar, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
+
+
+_PROHIBITED_AGGREGATE_SCORE_PATTERNS: tuple[re.Pattern[str], ...] = (
+    re.compile(r"\boverall[\s-]+score\b", re.IGNORECASE),
+    re.compile(r"\bcomposite[\s-]+score\b", re.IGNORECASE),
+    re.compile(r"\baggregate[\s-]+score\b", re.IGNORECASE),
+    re.compile(
+        r"\bweighted[\s-]+aggregate(?:[\s-]+score)?\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\bweighted[\s-]+average(?:[\s-]+score)?\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\bweighted[\s-]+(?:overall|composite)[\s-]+score\b",
+        re.IGNORECASE,
+    ),
+    re.compile(r"\branking[\s-]+signal\b", re.IGNORECASE),
+    re.compile(
+        r"\bsingle[\s-]+overall[\s-]+(?:score|ranking|rating|signal)\b",
+        re.IGNORECASE,
+    ),
+)
+
+
+def _append_index_to_path(path: tuple[str, ...], index: int) -> tuple[str, ...]:
+    if not path:
+        return (f"[{index}]",)
+    return (*path[:-1], f"{path[-1]}[{index}]")
+
+
+def _find_prohibited_aggregate_score_text(
+    value: object,
+    path: tuple[str, ...] = (),
+) -> tuple[str, str] | None:
+    if isinstance(value, str):
+        for pattern in _PROHIBITED_AGGREGATE_SCORE_PATTERNS:
+            match = pattern.search(value)
+            if match is not None:
+                return ".".join(path), match.group(0)
+        return None
+
+    if isinstance(value, BaseModel):
+        for field_name in type(value).model_fields:
+            result = _find_prohibited_aggregate_score_text(
+                getattr(value, field_name),
+                (*path, field_name),
+            )
+            if result is not None:
+                return result
+        return None
+
+    if isinstance(value, list):
+        for index, item in enumerate(value):
+            result = _find_prohibited_aggregate_score_text(
+                item,
+                _append_index_to_path(path, index),
+            )
+            if result is not None:
+                return result
+
+    return None
 
 
 class StrictSchema(BaseModel):
@@ -229,6 +293,17 @@ class InvestmentMemo(StrictSchema):
     reverse_dcf_expectations: ReverseDCFExpectations | None
     monitoring_rules: MonitoringRules
     recommended_next_step: str = Field(..., min_length=1)
+
+    @model_validator(mode="after")
+    def reject_aggregate_score_language(self) -> "InvestmentMemo":
+        prohibited_match = _find_prohibited_aggregate_score_text(self)
+        if prohibited_match is not None:
+            field_path, phrase = prohibited_match
+            raise ValueError(
+                "InvestmentMemo must not surface composite or weighted "
+                f"aggregate score language ({phrase!r} in {field_path})"
+            )
+        return self
 
 
 __all__ = [
