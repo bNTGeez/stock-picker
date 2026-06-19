@@ -3,6 +3,9 @@ from functools import lru_cache
 import os
 from pathlib import Path
 
+BACKEND_DIR = Path(__file__).resolve().parent
+DEFAULT_DATA_DIR = BACKEND_DIR / "data"
+
 
 def _float_env(name: str, default: float) -> float:
     value = os.getenv(name)
@@ -27,7 +30,7 @@ class Settings:
 
 @lru_cache
 def get_settings() -> Settings:
-    data_dir = Path(os.getenv("RESEARCH_DATA_DIR", "backend/data"))
+    data_dir = Path(os.getenv("RESEARCH_DATA_DIR", str(DEFAULT_DATA_DIR)))
     return Settings(
         llm_provider=os.getenv("RESEARCH_LLM_PROVIDER", "manual"),
         llm_api_key=os.getenv("RESEARCH_LLM_API_KEY"),

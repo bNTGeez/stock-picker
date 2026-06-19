@@ -1,4 +1,6 @@
-from backend.config import get_settings
+from pathlib import Path
+
+from backend.config import DEFAULT_DATA_DIR, get_settings
 
 
 def test_default_settings_are_available() -> None:
@@ -10,10 +12,26 @@ def test_default_settings_are_available() -> None:
     assert settings.llm_api_key is None
     assert settings.llm_model
     assert settings.quote_match_threshold == 0.95
-    assert str(settings.raw_data_dir).endswith("backend/data/raw")
+    assert settings.data_dir == DEFAULT_DATA_DIR
+    assert settings.raw_data_dir == DEFAULT_DATA_DIR / "raw"
+    assert settings.processed_data_dir == DEFAULT_DATA_DIR / "processed"
+    assert settings.data_dir.is_absolute()
 
 
 def test_settings_can_be_configured_from_environment(monkeypatch) -> None:
+    get_settings.cache_clear()
+
+
+def test_default_data_paths_do_not_depend_on_working_directory(monkeypatch) -> None:
+    get_settings.cache_clear()
+    monkeypatch.chdir(Path("/tmp"))
+
+    settings = get_settings()
+
+    assert settings.data_dir == DEFAULT_DATA_DIR
+    assert settings.raw_data_dir == DEFAULT_DATA_DIR / "raw"
+    assert settings.processed_data_dir == DEFAULT_DATA_DIR / "processed"
+
     get_settings.cache_clear()
     monkeypatch.setenv("RESEARCH_LLM_PROVIDER", "openai")
     monkeypatch.setenv("RESEARCH_LLM_API_KEY", "test-key")
