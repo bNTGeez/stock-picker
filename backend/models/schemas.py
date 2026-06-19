@@ -1,6 +1,6 @@
 """Pydantic schemas for investment research memos."""
 
-from datetime import date
+from datetime import date, datetime
 from enum import Enum
 import re
 from typing import ClassVar, Literal
@@ -104,6 +104,27 @@ class Confidence(str, Enum):
     LOW = "Low"
     MEDIUM = "Medium"
     HIGH = "High"
+
+
+class MemoQualityCriterion(str, Enum):
+    """Manual Phase 3 rubric criteria for memo quality review."""
+
+    REAL_VARIANT_HYPOTHESIS = "real_variant_hypothesis"
+    OBVIOUS_RISKS = "obvious_risks"
+    CONFIDENCE_CALIBRATION = "confidence_calibration"
+    PRICED_IN_EXPLANATION = "priced_in_explanation"
+    MONITORING_RULES = "monitoring_rules"
+    EVIDENCE_SUPPORT = "evidence_support"
+    OPPOSING_CASE = "opposing_case"
+    FINAL_SYNTHESIS = "final_synthesis"
+
+
+class MemoEvidenceValidationStatus(str, Enum):
+    """Reviewer status for the memo's source-backed evidence."""
+
+    VALIDATED = "validated"
+    UNVALIDATED = "unvalidated"
+    FABRICATED = "fabricated"
 
 
 class EvidenceItem(StrictSchema):
@@ -306,6 +327,51 @@ class InvestmentMemo(StrictSchema):
         return self
 
 
+class ManualMemoQualityCriterionScore(StrictSchema):
+    """Human-entered score and notes for one Phase 3 rubric criterion."""
+
+    criterion: MemoQualityCriterion
+    score: int = Field(..., ge=1, le=5)
+    notes: str = Field(..., min_length=1)
+
+
+class ManualMemoQualityReview(StrictSchema):
+    """Complete manual Phase 3 quality review for one generated memo."""
+
+    memo_identifier: str = Field(..., min_length=1)
+    reviewer: str = Field(..., min_length=1)
+    reviewed_at: datetime | None = None
+    criterion_scores: list[ManualMemoQualityCriterionScore] = Field(..., min_length=1)
+    evidence_validation_status: MemoEvidenceValidationStatus
+    evidence_notes: str = Field(..., min_length=1)
+    overall_notes: str | None = Field(default=None, min_length=1)
+
+    @model_validator(mode="after")
+    def require_each_phase_3_criterion_once(self) -> "ManualMemoQualityReview":
+        criteria = [score.criterion for score in self.criterion_scores]
+        duplicate_criteria = {
+            criterion for criterion in criteria if criteria.count(criterion) > 1
+        }
+        if duplicate_criteria:
+            duplicates = ", ".join(
+                sorted(criterion.value for criterion in duplicate_criteria)
+            )
+            raise ValueError(
+                f"Manual memo quality review has duplicate criteria: {duplicates}"
+            )
+
+        missing_criteria = set(MemoQualityCriterion) - set(criteria)
+        if missing_criteria:
+            missing = ", ".join(
+                sorted(criterion.value for criterion in missing_criteria)
+            )
+            raise ValueError(
+                f"Manual memo quality review is missing criteria: {missing}"
+            )
+
+        return self
+
+
 __all__ = [
     "AdversarialResearchSection",
     "CategoryScore",
@@ -314,6 +380,10 @@ __all__ = [
     "EvidenceItem",
     "InvestmentMemo",
     "InvestmentStance",
+    "ManualMemoQualityCriterionScore",
+    "ManualMemoQualityReview",
+    "MemoEvidenceValidationStatus",
+    "MemoQualityCriterion",
     "MonitoringRule",
     "MonitoringRules",
     "ObservationItem",
