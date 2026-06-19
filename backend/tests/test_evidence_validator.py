@@ -60,7 +60,8 @@ def test_whitespace_normalized_match() -> None:
 
     assert located.normalized_quote == "Revenue grew as retention improved."
     assert located.match_score == 1.0
-    assert document.text[located.located_start_offset : located.located_end_offset]
+    assert located.located_start_offset == 0
+    assert located.located_end_offset == len(located.normalized_quote)
 
 
 def test_fuzzy_accepted_match() -> None:
@@ -102,6 +103,38 @@ def test_fabricated_quote_rejection() -> None:
 
     with pytest.raises(EvidenceValidationError, match="could not be located"):
         locate_evidence_item(evidence, source_documents(), threshold=0.90)
+
+
+@pytest.mark.parametrize(
+    ("source_text", "quote"),
+    [
+        (
+            "Revenue grew 5% as retention improved.",
+            "Revenue grew 50% as retention improved.",
+        ),
+        (
+            "Operating margin was 12.4% as scale improved.",
+            "Operating margin was 42.4% as scale improved.",
+        ),
+        (
+            "Revenue increased 5% as retention improved.",
+            "Revenue decreased 5% as retention improved.",
+        ),
+        (
+            "ACME revenue grew 5% as retention improved.",
+            "ANME revenue grew 5% as retention improved.",
+        ),
+    ],
+)
+def test_high_similarity_material_changes_are_rejected(
+    source_text: str,
+    quote: str,
+) -> None:
+    evidence = EvidenceItem(source="FY2026 Form 10-K", quote=quote)
+    document = SourceDocument(source="FY2026 Form 10-K", text=source_text)
+
+    with pytest.raises(EvidenceValidationError, match="could not be located"):
+        locate_evidence_item(evidence, [document], threshold=0.95)
 
 
 def test_valid_memo_receives_offsets_and_match_scores() -> None:

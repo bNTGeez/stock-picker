@@ -36,7 +36,6 @@ class SourceDocument:
 @dataclass(frozen=True)
 class _NormalizedText:
     text: str
-    offsets: list[int]
 
 
 @dataclass(frozen=True)
@@ -52,35 +51,136 @@ def normalize_whitespace(text: str) -> str:
     return _WHITESPACE_RE.sub(" ", text).strip()
 
 
-def _normalize_with_offsets(text: str) -> _NormalizedText:
+def _normalize_source_text(text: str) -> _NormalizedText:
     normalized_chars: list[str] = []
-    offsets: list[int] = []
-    pending_space_offset: int | None = None
+    has_pending_space = False
     seen_non_space = False
 
-    for offset, char in enumerate(text):
+    for char in text:
         if char.isspace():
-            if seen_non_space and pending_space_offset is None:
-                pending_space_offset = offset
+            if seen_non_space:
+                has_pending_space = True
             continue
 
-        if pending_space_offset is not None:
+        if has_pending_space:
             normalized_chars.append(" ")
-            offsets.append(pending_space_offset)
-            pending_space_offset = None
+            has_pending_space = False
 
         normalized_chars.append(char)
-        offsets.append(offset)
         seen_non_space = True
 
-    return _NormalizedText(text="".join(normalized_chars), offsets=offsets)
+    return _NormalizedText(text="".join(normalized_chars))
 
 
-def _original_offsets(normalized: _NormalizedText, start: int, end: int) -> tuple[int, int]:
-    if start < 0 or end <= start or end > len(normalized.offsets):
+def _validate_normalized_offsets(
+    normalized: _NormalizedText,
+    start: int,
+    end: int,
+) -> tuple[int, int]:
+    if start < 0 or end <= start or end > len(normalized.text):
         raise EvidenceValidationError("Evidence match produced invalid offsets")
 
-    return normalized.offsets[start], normalized.offsets[end - 1] + 1
+    return start, end
+
+
+_CONTENT_TOKEN_RE = re.compile(r"[A-Za-z0-9]+(?:[./:-][A-Za-z0-9]+)*|[%$]")
+
+
+def _content_tokens(text: str) -> list[str]:
+    return _CONTENT_TOKEN_RE.findall(text)
+
+
+def _is_protected_token(token: str) -> bool:
+    return (
+        any(char.isdigit() for char in token)
+        or token in {"%", "$"}
+        or (len(token) > 1 and token.isupper())
+        or token[:1].isupper()
+    )
+
+
+def _edit_distance(left: str, right: str) -> int:
+    if len(left) < len(right):
+        left, right = right, left
+
+    previous_row = list(range(len(right) + 1))
+    for left_index, left_char in enumerate(left, start=1):
+        current_row = [left_index]
+        for right_index, right_char in enumerate(right, start=1):
+            current_row.append(
+                min(
+                    previous_row[right_index] + 1,
+                    current_row[right_index - 1] + 1,
+                    previous_row[right_index - 1] + (left_char != right_char),
+                )
+            )
+        previous_row = current_row
+    return previous_row[-1]
+
+
+def _is_minor_token_typo(quote_token: str, source_token: str) -> bool:
+    quote_lower = quote_token.lower()
+    source_lower = source_token.lower()
+    if quote_lower == source_lower:
+        return True
+    if _is_protected_token(quote_token) or _is_protected_token(source_token):
+        return False
+    if not quote_lower.isalpha() or not source_lower.isalpha():
+        return False
+    if min(len(quote_lower), len(source_lower)) < 4:
+        return False
+    if quote_lower[0] != source_lower[0]:
+        return False
+
+    return _edit_distance(quote_lower, source_lower) <= 1
+
+
+def _tokens_are_fuzzy_safe(quote: str, candidate: str) -> bool:
+    quote_tokens = _content_tokens(quote)
+    candidate_tokens = _content_tokens(candidate)
+    if not quote_tokens or not candidate_tokens:
+        return False
+
+    quote_protected = [token for token in quote_tokens if _is_protected_token(token)]
+    candidate_protected = [
+        token for token in candidate_tokens if _is_protected_token(token)
+    ]
+    if quote_protected != candidate_protected:
+        return False
+
+    matcher = SequenceMatcher(
+        None,
+        [token.lower() for token in quote_tokens],
+        [token.lower() for token in candidate_tokens],
+        autojunk=False,
+    )
+    for (
+        tag,
+        quote_start,
+        quote_end,
+        candidate_start,
+        candidate_end,
+    ) in matcher.get_opcodes():
+        if tag == "equal":
+            continue
+        if tag != "replace":
+            return False
+
+        quote_replacements = quote_tokens[quote_start:quote_end]
+        candidate_replacements = candidate_tokens[candidate_start:candidate_end]
+        if len(quote_replacements) != len(candidate_replacements):
+            return False
+        if not all(
+            _is_minor_token_typo(quote_token, candidate_token)
+            for quote_token, candidate_token in zip(
+                quote_replacements,
+                candidate_replacements,
+                strict=True,
+            )
+        ):
+            return False
+
+    return True
 
 
 def _candidate_fuzzy_starts(quote: str, source: str) -> set[int]:
@@ -115,6 +215,8 @@ def _fuzzy_locate(quote: str, source: str) -> tuple[int, int, float] | None:
                 break
             candidate = source[start:end]
             score = SequenceMatcher(None, quote, candidate, autojunk=False).ratio()
+            if not _tokens_are_fuzzy_safe(quote, candidate):
+                continue
             if best is None or score > best[2]:
                 best = (start, end, score)
 
@@ -128,7 +230,7 @@ def _locate_normalized_quote(
     exact_start = normalized_source.text.find(normalized_quote)
     if exact_start >= 0:
         exact_end = exact_start + len(normalized_quote)
-        start_offset, end_offset = _original_offsets(
+        start_offset, end_offset = _validate_normalized_offsets(
             normalized_source,
             exact_start,
             exact_end,
@@ -144,7 +246,7 @@ def _locate_normalized_quote(
         return None
 
     fuzzy_start, fuzzy_end, score = fuzzy
-    start_offset, end_offset = _original_offsets(
+    start_offset, end_offset = _validate_normalized_offsets(
         normalized_source,
         fuzzy_start,
         fuzzy_end,
@@ -193,7 +295,7 @@ def locate_evidence_item(
 
     best_match: _EvidenceMatch | None = None
     for document in matching_documents:
-        normalized_source = _normalize_with_offsets(document.text)
+        normalized_source = _normalize_source_text(document.text)
         located = _locate_normalized_quote(normalized_quote, normalized_source)
         if located is not None and (
             best_match is None or located.score > best_match.score
