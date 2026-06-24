@@ -13,6 +13,7 @@ from backend.services.manual_memo_generator import (
     REASONING_CHAIN,
     build_manual_memo_prompt,
     parse_investment_memo_response,
+    reverse_dcf_expectations_from_request,
     source_documents_from_request,
 )
 from backend.services.memo_quality_gate import (
@@ -26,6 +27,15 @@ from backend.services.memo_quality_gate import (
     QUALITATIVE_ONLY_CRITERIA_UNTIL_PHASE_4,
     evaluate_memo_quality_gate,
     evaluate_single_memo_quality_review,
+)
+from backend.services.reverse_dcf import (
+    ReverseDCFCyclicalityAdjustment,
+    ReverseDCFDilutionAdjustment,
+    ReverseDCFInputs,
+    ReverseDCFScenarioValues,
+    ReverseDCFSBCAdjustment,
+    ReverseDCFTerminalAssumptions,
+    calculate_reverse_dcf_expectations,
 )
 
 __all__ = [
@@ -47,9 +57,17 @@ __all__ = [
     "Phase3MemoQualityGateResult",
     "QUALITATIVE_ONLY_CRITERIA_UNTIL_PHASE_4",
     "REASONING_CHAIN",
+    "ReverseDCFCyclicalityAdjustment",
+    "ReverseDCFDilutionAdjustment",
+    "ReverseDCFInputs",
+    "ReverseDCFScenarioValues",
+    "ReverseDCFSBCAdjustment",
+    "ReverseDCFTerminalAssumptions",
     "build_manual_memo_prompt",
+    "calculate_reverse_dcf_expectations",
     "evaluate_memo_quality_gate",
     "evaluate_single_memo_quality_review",
     "parse_investment_memo_response",
+    "reverse_dcf_expectations_from_request",
     "source_documents_from_request",
 ]

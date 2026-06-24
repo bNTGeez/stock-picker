@@ -9,11 +9,19 @@ from typing import Protocol
 
 from pydantic import Field, ValidationError
 
-from backend.models.schemas import InvestmentMemo, StrictSchema
+from backend.models.schemas import (
+    InvestmentMemo,
+    ReverseDCFExpectations,
+    StrictSchema,
+)
 from backend.services.evidence_validator import (
     EvidenceValidationError,
     SourceDocument,
     validate_memo_evidence,
+)
+from backend.services.reverse_dcf import (
+    ReverseDCFInputs,
+    calculate_reverse_dcf_expectations,
 )
 
 
@@ -77,6 +85,7 @@ class ManualMemoRequest(StrictSchema):
     ten_k_excerpts: list[ManualSourceExcerpt] = Field(..., min_length=1)
     transcript_excerpts: list[ManualSourceExcerpt] = Field(..., min_length=1)
     consensus_notes: list[str] = Field(default_factory=list)
+    reverse_dcf_inputs: ReverseDCFInputs | None = None
 
 
 class ManualMemoGenerator:
@@ -88,9 +97,15 @@ class ManualMemoGenerator:
     def generate(self, request: ManualMemoRequest) -> InvestmentMemo:
         prompt = build_manual_memo_prompt(request)
         response = self._llm.generate(prompt)
-        return parse_investment_memo_response(
+        memo = parse_investment_memo_response(
             response,
             source_documents=source_documents_from_request(request),
+        )
+        reverse_dcf_expectations = reverse_dcf_expectations_from_request(request)
+        if reverse_dcf_expectations is None:
+            return memo
+        return memo.model_copy(
+            update={"reverse_dcf_expectations": reverse_dcf_expectations}
         )
 
 
@@ -98,7 +113,11 @@ def build_manual_memo_prompt(request: ManualMemoRequest) -> str:
     """Build the constrained prompt for the manual research copilot."""
 
     memo_schema = json.dumps(InvestmentMemo.model_json_schema(), indent=2)
-    request_json = request.model_dump_json(indent=2)
+    request_json = request.model_dump_json(indent=2, exclude={"reverse_dcf_inputs"})
+    reverse_dcf_expectations = reverse_dcf_expectations_from_request(request)
+    reverse_dcf_instruction = _reverse_dcf_prompt_instruction(
+        reverse_dcf_expectations
+    )
 
     return f"""You are a manual investment research copilot.
 
@@ -134,8 +153,7 @@ Reflect the chain in the InvestmentMemo fields:
   recommended_next_step must follow from the verdict without making a capital
   allocation decision.
 
-Do not perform reverse DCF calculations. Set reverse_dcf_expectations to null
-unless explicit reverse DCF outputs are supplied in the manual inputs. Populate
+Do not perform reverse DCF calculations. {reverse_dcf_instruction} Populate
 valuation_range with Bear, Base, and Bull scenarios using assumptions, implied
 outcomes, and supporting evidence from the supplied excerpts. Do not add an
 overall score, composite score, weighted aggregate, ranking signal, price target,
@@ -159,8 +177,9 @@ capitalise a word that is lowercase in the source. Whitespace normalisation is
 acceptable, but fabricated, paraphrased, or unlocatable quotes are invalid.
 Do not invent evidence when the supplied excerpts are insufficient; use
 research_verdict "Insufficient Evidence", confidence "Low", and explain the
-unknown facts in unknowns. Leave normalized_quote, located_start_offset,
-located_end_offset, and match_score null or omitted; the validator populates them.
+unknown facts in unknowns. fabricated or unlocatable quotes are invalid. Leave
+normalized_quote, located_start_offset, located_end_offset, and match_score null
+or omitted; the validator populates them.
 
 InvestmentMemo JSON schema:
 {memo_schema}
@@ -168,6 +187,35 @@ InvestmentMemo JSON schema:
 Manual inputs:
 {request_json}
 """
+
+
+def reverse_dcf_expectations_from_request(
+    request: ManualMemoRequest,
+) -> ReverseDCFExpectations | None:
+    """Return deterministic reverse DCF output for a manual memo request."""
+
+    if request.reverse_dcf_inputs is None:
+        return None
+    return calculate_reverse_dcf_expectations(request.reverse_dcf_inputs)
+
+
+def _reverse_dcf_prompt_instruction(
+    reverse_dcf_expectations: ReverseDCFExpectations | None,
+) -> str:
+    if reverse_dcf_expectations is None:
+        return (
+            "Set reverse_dcf_expectations to null because no deterministic "
+            "reverse DCF outputs were supplied."
+        )
+
+    reverse_dcf_json = reverse_dcf_expectations.model_dump_json(indent=2)
+    return (
+        "Use the deterministic reverse DCF outputs below exactly as supplied. "
+        "You may explain these outputs in market_expectations, but do not "
+        "recalculate, alter, interpolate, annualize, or extend them.\n\n"
+        "Deterministic reverse DCF outputs:\n"
+        f"{reverse_dcf_json}"
+    )
 
 
 def source_documents_from_request(request: ManualMemoRequest) -> list[SourceDocument]:
@@ -233,5 +281,6 @@ __all__ = [
     "REASONING_CHAIN",
     "build_manual_memo_prompt",
     "parse_investment_memo_response",
+    "reverse_dcf_expectations_from_request",
     "source_documents_from_request",
 ]

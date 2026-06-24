@@ -14,7 +14,13 @@ from backend.services.manual_memo_generator import (
     REASONING_CHAIN,
     build_manual_memo_prompt,
     parse_investment_memo_response,
+    reverse_dcf_expectations_from_request,
     source_documents_from_request,
+)
+from backend.services.reverse_dcf import (
+    ReverseDCFInputs,
+    ReverseDCFScenarioValues,
+    ReverseDCFTerminalAssumptions,
 )
 
 
@@ -195,6 +201,38 @@ def manual_request() -> ManualMemoRequest:
     )
 
 
+def reverse_dcf_inputs() -> ReverseDCFInputs:
+    return ReverseDCFInputs(
+        share_price=20,
+        shares_outstanding=100,
+        net_debt=200,
+        current_revenue=500,
+        fcf_margin_assumptions=ReverseDCFScenarioValues(
+            low=0.18,
+            mid=0.20,
+            high=0.22,
+        ),
+        wacc_range=ReverseDCFScenarioValues(
+            low=0.08,
+            mid=0.10,
+            high=0.12,
+        ),
+        terminal_assumptions=ReverseDCFTerminalAssumptions(
+            projection_years=5,
+            terminal_growth_rate=ReverseDCFScenarioValues(
+                low=0.02,
+                mid=0.025,
+                high=0.03,
+            ),
+            revenue_cagr_assumptions=ReverseDCFScenarioValues(
+                low=0.04,
+                mid=0.07,
+                high=0.10,
+            ),
+        ),
+    )
+
+
 def test_stub_llm_response_parses_into_investment_memo() -> None:
     stub = StubLLM(json.dumps(complete_memo_data()))
     generator = ManualMemoGenerator(stub)
@@ -220,6 +258,30 @@ def test_stub_llm_response_parses_into_investment_memo() -> None:
     )
     assert memo.observations.observations[0].supporting_evidence[0].match_score == 1.0
     assert stub.prompts
+
+
+def test_generator_populates_reverse_dcf_from_deterministic_output() -> None:
+    data = complete_memo_data()
+    data["reverse_dcf_expectations"] = {
+        "implied_revenue_cagr_low": 0.0,
+        "implied_revenue_cagr_mid": 0.0,
+        "implied_revenue_cagr_high": 0.0,
+        "implied_fcf_margin_low": 0.0,
+        "implied_fcf_margin_mid": 0.0,
+        "implied_fcf_margin_high": 0.0,
+    }
+    request = manual_request().model_copy(
+        update={"reverse_dcf_inputs": reverse_dcf_inputs()}
+    )
+    stub = StubLLM(json.dumps(data))
+    generator = ManualMemoGenerator(stub)
+
+    memo = generator.generate(request)
+    expected = reverse_dcf_expectations_from_request(request)
+
+    assert memo.reverse_dcf_expectations == expected
+    assert expected is not None
+    assert expected.implied_revenue_cagr_mid == 0.141
 
 
 def test_invalid_json_fails_clearly() -> None:
@@ -267,3 +329,18 @@ def test_prompt_includes_corrected_schema_and_reasoning_chain() -> None:
     assert "weighted aggregate" in prompt
     assert "fabricated or unlocatable quotes are invalid" in prompt
     assert "Insufficient Evidence" in prompt
+
+
+def test_prompt_supplies_only_deterministic_reverse_dcf_outputs() -> None:
+    request = manual_request().model_copy(
+        update={"reverse_dcf_inputs": reverse_dcf_inputs()}
+    )
+
+    prompt = build_manual_memo_prompt(request)
+
+    assert "Deterministic reverse DCF outputs" in prompt
+    assert "implied_revenue_cagr_mid" in prompt
+    assert "0.141" in prompt
+    assert "do not recalculate" in prompt
+    assert "Set reverse_dcf_expectations to null" not in prompt
+    assert "shares_outstanding" not in prompt
