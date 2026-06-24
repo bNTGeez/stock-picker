@@ -1,0 +1,649 @@
+You are a manual investment research copilot.
+
+Return only valid JSON. Do not include markdown, prose, comments, or code fences.
+The JSON object must match the InvestmentMemo schema exactly.
+
+Use only the information in the attached source documents. Do not use outside knowledge or information not present in the attached files.
+
+Preserve this reasoning chain in the memo:
+Evidence -> Observations -> Market Expectations -> Variant Hypothesis -> Adversarial Research Reasoning -> Research Verdict -> Investment Stance
+
+Reflect the chain in the InvestmentMemo fields:
+- Evidence: source-backed EvidenceItem entries using source_type, source_tier, source_id, and quotes copied from the attached documents. Set source_id to a descriptive label matching the document (e.g. "Meta FY2025 10-K Item 1A", "Meta Q1 2026 Earnings Call").
+- Observations: observations supported by EvidenceItem entries.
+- Market Expectations: market_expectations must state what the current price and consensus appears to assume.
+- Variant Hypothesis: variant_hypothesis must explain the thesis that differs from those expectations.
+- Why Consensus May Be Wrong: why_consensus_may_be_wrong must connect the observations to the variant hypothesis.
+- Adversarial Research Reasoning: adversarial_research must include bull_case, bear_case, key_disagreement, evidence_for_variant_view, evidence_against_variant_view, rebuttal, disconfirming_evidence, and final_synthesis.
+- Research Verdict: research_verdict and confidence must follow from the full reasoning chain.
+- Investment Stance: investment_stance, top_risks, monitoring_rules, and recommended_next_step must follow from the verdict without making a capital allocation decision.
+
+Do not perform reverse DCF calculations. Set reverse_dcf_expectations to null.
+Populate valuation_range with Bear, Base, and Bull scenarios using assumptions, implied outcomes, and supporting evidence from the attached documents.
+Do not add an overall score, composite score, weighted aggregate, ranking signal, price target, or buy/sell recommendation.
+
+Category score weights must be exactly: business_quality=0.30, risk_profile=0.20, expectations_gap=0.20, variant_perception=0.15, valuation=0.10, catalyst=0.05. Do not use any other values.
+
+Every EvidenceItem quote must be copied character-for-character from the attached source documents, including exact capitalisation. If a sentence begins with a lowercase letter in the source, the quote must also begin with a lowercase letter. Whitespace normalisation is acceptable, but fabricated, paraphrased, or unlocatable quotes are invalid.
+Do not invent evidence when the attached documents are insufficient; use research_verdict "Insufficient Evidence", confidence "Low", and explain the gaps in unknowns.
+Leave normalized_quote, located_start_offset, located_end_offset, and match_score null or omitted; the validator populates them.
+
+
+Important: use these exact source_id values in every EvidenceItem so the validator can match them:
+- "Meta FY2025 10-K" for anything from the annual report
+- "Meta Q1 2026 Earnings Call" for anything from the earnings transcript
+
+The company is Meta Platforms, ticker META, memo_date 2026-06-19.
+
+InvestmentMemo JSON schema:
+{
+  "$defs": {
+    "AdversarialResearchSection": {
+      "additionalProperties": false,
+      "description": "Bull, bear, and disconfirming tests of the variant hypothesis.",
+      "properties": {
+        "bull_case": {
+          "minLength": 1,
+          "title": "Bull Case",
+          "type": "string"
+        },
+        "bear_case": {
+          "minLength": 1,
+          "title": "Bear Case",
+          "type": "string"
+        },
+        "key_disagreement": {
+          "minLength": 1,
+          "title": "Key Disagreement",
+          "type": "string"
+        },
+        "evidence_for_variant_view": {
+          "items": {
+            "$ref": "#/$defs/EvidenceItem"
+          },
+          "minItems": 1,
+          "title": "Evidence For Variant View",
+          "type": "array"
+        },
+        "evidence_against_variant_view": {
+          "items": {
+            "$ref": "#/$defs/EvidenceItem"
+          },
+          "minItems": 1,
+          "title": "Evidence Against Variant View",
+          "type": "array"
+        },
+        "rebuttal": {
+          "minLength": 1,
+          "title": "Rebuttal",
+          "type": "string"
+        },
+        "disconfirming_evidence": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Disconfirming Evidence",
+          "type": "array"
+        },
+        "final_synthesis": {
+          "minLength": 1,
+          "title": "Final Synthesis",
+          "type": "string"
+        }
+      },
+      "required": [
+        "bull_case",
+        "bear_case",
+        "key_disagreement",
+        "evidence_for_variant_view",
+        "evidence_against_variant_view",
+        "rebuttal",
+        "disconfirming_evidence",
+        "final_synthesis"
+      ],
+      "title": "AdversarialResearchSection",
+      "type": "object"
+    },
+    "CategoryScore": {
+      "additionalProperties": false,
+      "description": "Non-aggregate score label for one research category.",
+      "properties": {
+        "score": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Score",
+          "type": "integer"
+        },
+        "weight": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Weight",
+          "type": "number"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "score",
+        "weight",
+        "rationale"
+      ],
+      "title": "CategoryScore",
+      "type": "object"
+    },
+    "CategoryScores": {
+      "additionalProperties": false,
+      "description": "Fixed-weight category score labels for an investment memo.",
+      "properties": {
+        "business_quality": {
+          "$ref": "#/$defs/CategoryScore"
+        },
+        "risk_profile": {
+          "$ref": "#/$defs/CategoryScore"
+        },
+        "expectations_gap": {
+          "$ref": "#/$defs/CategoryScore"
+        },
+        "variant_perception": {
+          "$ref": "#/$defs/CategoryScore"
+        },
+        "valuation": {
+          "$ref": "#/$defs/CategoryScore"
+        },
+        "catalyst": {
+          "$ref": "#/$defs/CategoryScore"
+        }
+      },
+      "required": [
+        "business_quality",
+        "risk_profile",
+        "expectations_gap",
+        "variant_perception",
+        "valuation",
+        "catalyst"
+      ],
+      "title": "CategoryScores",
+      "type": "object"
+    },
+    "Confidence": {
+      "description": "Confidence level for the stated verdict.",
+      "enum": [
+        "Low",
+        "Medium",
+        "High"
+      ],
+      "title": "Confidence",
+      "type": "string"
+    },
+    "EvidenceItem": {
+      "additionalProperties": false,
+      "description": "Source-backed evidence referenced by an observation.",
+      "properties": {
+        "source_type": {
+          "minLength": 1,
+          "title": "Source Type",
+          "type": "string"
+        },
+        "source_tier": {
+          "maximum": 4,
+          "minimum": 1,
+          "title": "Source Tier",
+          "type": "integer"
+        },
+        "source_id": {
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "quote": {
+          "minLength": 1,
+          "title": "Quote",
+          "type": "string"
+        },
+        "normalized_quote": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Normalized Quote"
+        },
+        "located_start_offset": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Located Start Offset"
+        },
+        "located_end_offset": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Located End Offset"
+        },
+        "match_score": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Match Score"
+        }
+      },
+      "required": [
+        "source_type",
+        "source_tier",
+        "source_id",
+        "quote"
+      ],
+      "title": "EvidenceItem",
+      "type": "object"
+    },
+    "InvestmentStance": {
+      "description": "Investment stance implied by the research.",
+      "enum": [
+        "Bearish",
+        "Lean Bearish",
+        "Neutral",
+        "Lean Bullish",
+        "Bullish"
+      ],
+      "title": "InvestmentStance",
+      "type": "string"
+    },
+    "MonitoringRule": {
+      "additionalProperties": false,
+      "description": "Rule for tracking thesis drift after memo publication.",
+      "properties": {
+        "trigger": {
+          "minLength": 1,
+          "title": "Trigger",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceItem"
+          },
+          "title": "Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "trigger",
+        "rationale"
+      ],
+      "title": "MonitoringRule",
+      "type": "object"
+    },
+    "MonitoringRules": {
+      "additionalProperties": false,
+      "description": "Green, yellow, and red thesis monitoring triggers.",
+      "properties": {
+        "green_flags": {
+          "items": {
+            "$ref": "#/$defs/MonitoringRule"
+          },
+          "minItems": 1,
+          "title": "Green Flags",
+          "type": "array"
+        },
+        "yellow_flags": {
+          "items": {
+            "$ref": "#/$defs/MonitoringRule"
+          },
+          "minItems": 1,
+          "title": "Yellow Flags",
+          "type": "array"
+        },
+        "red_flags": {
+          "items": {
+            "$ref": "#/$defs/MonitoringRule"
+          },
+          "minItems": 1,
+          "title": "Red Flags",
+          "type": "array"
+        }
+      },
+      "required": [
+        "green_flags",
+        "yellow_flags",
+        "red_flags"
+      ],
+      "title": "MonitoringRules",
+      "type": "object"
+    },
+    "ObservationItem": {
+      "additionalProperties": false,
+      "description": "Analytical observation supported by one or more evidence items.",
+      "properties": {
+        "statement": {
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "supporting_evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceItem"
+          },
+          "minItems": 1,
+          "title": "Supporting Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "statement",
+        "supporting_evidence"
+      ],
+      "title": "ObservationItem",
+      "type": "object"
+    },
+    "ObservationSection": {
+      "additionalProperties": false,
+      "description": "Memo observations.",
+      "properties": {
+        "observations": {
+          "items": {
+            "$ref": "#/$defs/ObservationItem"
+          },
+          "minItems": 1,
+          "title": "Observations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "observations"
+      ],
+      "title": "ObservationSection",
+      "type": "object"
+    },
+    "ResearchVerdict": {
+      "description": "Final research conclusion for a memo.",
+      "enum": [
+        "Insufficient Evidence",
+        "Reject",
+        "Watchlist",
+        "Research Further",
+        "Candidate",
+        "High Conviction Candidate"
+      ],
+      "title": "ResearchVerdict",
+      "type": "string"
+    },
+    "ReverseDCFExpectations": {
+      "additionalProperties": false,
+      "description": "Expectations implied by market price from a reverse DCF analysis.",
+      "properties": {
+        "implied_revenue_cagr_low": {
+          "title": "Implied Revenue Cagr Low",
+          "type": "number"
+        },
+        "implied_revenue_cagr_mid": {
+          "title": "Implied Revenue Cagr Mid",
+          "type": "number"
+        },
+        "implied_revenue_cagr_high": {
+          "title": "Implied Revenue Cagr High",
+          "type": "number"
+        },
+        "implied_fcf_margin_low": {
+          "title": "Implied Fcf Margin Low",
+          "type": "number"
+        },
+        "implied_fcf_margin_mid": {
+          "title": "Implied Fcf Margin Mid",
+          "type": "number"
+        },
+        "implied_fcf_margin_high": {
+          "title": "Implied Fcf Margin High",
+          "type": "number"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        }
+      },
+      "required": [
+        "implied_revenue_cagr_low",
+        "implied_revenue_cagr_mid",
+        "implied_revenue_cagr_high",
+        "implied_fcf_margin_low",
+        "implied_fcf_margin_mid",
+        "implied_fcf_margin_high"
+      ],
+      "title": "ReverseDCFExpectations",
+      "type": "object"
+    },
+    "UnknownsSection": {
+      "additionalProperties": false,
+      "description": "Known unknowns that remain after research.",
+      "properties": {
+        "unknowns": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Unknowns",
+          "type": "array"
+        }
+      },
+      "required": [
+        "unknowns"
+      ],
+      "title": "UnknownsSection",
+      "type": "object"
+    },
+    "ValuationRange": {
+      "additionalProperties": false,
+      "description": "Bear/Base/Bull valuation range for the memo.",
+      "properties": {
+        "bear": {
+          "$ref": "#/$defs/ValuationScenario"
+        },
+        "base": {
+          "$ref": "#/$defs/ValuationScenario"
+        },
+        "bull": {
+          "$ref": "#/$defs/ValuationScenario"
+        }
+      },
+      "required": [
+        "bear",
+        "base",
+        "bull"
+      ],
+      "title": "ValuationRange",
+      "type": "object"
+    },
+    "ValuationScenario": {
+      "additionalProperties": false,
+      "description": "Single Bear/Base/Bull valuation case with explicit assumptions.",
+      "properties": {
+        "label": {
+          "enum": [
+            "Bear",
+            "Base",
+            "Bull"
+          ],
+          "title": "Label",
+          "type": "string"
+        },
+        "assumptions": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Assumptions",
+          "type": "array"
+        },
+        "implied_outcome": {
+          "minLength": 1,
+          "title": "Implied Outcome",
+          "type": "string"
+        },
+        "supporting_evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceItem"
+          },
+          "minItems": 1,
+          "title": "Supporting Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "label",
+        "assumptions",
+        "implied_outcome",
+        "supporting_evidence"
+      ],
+      "title": "ValuationScenario",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Complete investment memo schema contract.",
+  "properties": {
+    "company_name": {
+      "minLength": 1,
+      "title": "Company Name",
+      "type": "string"
+    },
+    "ticker": {
+      "minLength": 1,
+      "title": "Ticker",
+      "type": "string"
+    },
+    "memo_date": {
+      "format": "date",
+      "title": "Memo Date",
+      "type": "string"
+    },
+    "research_verdict": {
+      "$ref": "#/$defs/ResearchVerdict"
+    },
+    "investment_stance": {
+      "$ref": "#/$defs/InvestmentStance"
+    },
+    "confidence": {
+      "$ref": "#/$defs/Confidence"
+    },
+    "category_scores": {
+      "$ref": "#/$defs/CategoryScores"
+    },
+    "market_expectations": {
+      "minLength": 1,
+      "title": "Market Expectations",
+      "type": "string"
+    },
+    "observations": {
+      "$ref": "#/$defs/ObservationSection"
+    },
+    "variant_hypothesis": {
+      "minLength": 1,
+      "title": "Variant Hypothesis",
+      "type": "string"
+    },
+    "why_consensus_may_be_wrong": {
+      "minLength": 1,
+      "title": "Why Consensus May Be Wrong",
+      "type": "string"
+    },
+    "adversarial_research": {
+      "$ref": "#/$defs/AdversarialResearchSection"
+    },
+    "unknowns": {
+      "$ref": "#/$defs/UnknownsSection"
+    },
+    "top_risks": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Top Risks",
+      "type": "array"
+    },
+    "valuation_range": {
+      "$ref": "#/$defs/ValuationRange"
+    },
+    "reverse_dcf_expectations": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ReverseDCFExpectations"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "monitoring_rules": {
+      "$ref": "#/$defs/MonitoringRules"
+    },
+    "recommended_next_step": {
+      "minLength": 1,
+      "title": "Recommended Next Step",
+      "type": "string"
+    }
+  },
+  "required": [
+    "company_name",
+    "ticker",
+    "memo_date",
+    "research_verdict",
+    "investment_stance",
+    "confidence",
+    "category_scores",
+    "market_expectations",
+    "observations",
+    "variant_hypothesis",
+    "why_consensus_may_be_wrong",
+    "adversarial_research",
+    "unknowns",
+    "top_risks",
+    "valuation_range",
+    "reverse_dcf_expectations",
+    "monitoring_rules",
+    "recommended_next_step"
+  ],
+  "title": "InvestmentMemo",
+  "type": "object"
+}

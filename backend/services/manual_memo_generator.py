@@ -141,8 +141,22 @@ outcomes, and supporting evidence from the supplied excerpts. Do not add an
 overall score, composite score, weighted aggregate, ranking signal, price target,
 or buy/sell recommendation.
 
-Every EvidenceItem quote must be copied from the supplied excerpts. Whitespace
-differences are acceptable, but fabricated or unlocatable quotes are invalid.
+Category score weights must be exactly: business_quality=0.30, risk_profile=0.20,
+expectations_gap=0.20, variant_perception=0.15, valuation=0.10, catalyst=0.05.
+Do not use any other values.
+
+Prioritize backward-looking evidence — historical results, completed periods, and
+reported metrics — over management's forward-looking statements. Forward guidance
+may be cited as supplementary evidence but must not be the primary basis for
+observations or the variant hypothesis. If the variant relies mainly on management's
+characterisation of future backlog or pipeline, explicitly note this as a limitation
+in the unknowns section.
+
+Every EvidenceItem quote must be copied character-for-character from the supplied
+excerpts, including exact capitalisation. If a sentence begins with a lowercase
+letter in the source, the quote must also begin with a lowercase letter. Do not
+capitalise a word that is lowercase in the source. Whitespace normalisation is
+acceptable, but fabricated, paraphrased, or unlocatable quotes are invalid.
 Do not invent evidence when the supplied excerpts are insufficient; use
 research_verdict "Insufficient Evidence", confidence "Low", and explain the
 unknown facts in unknowns. Leave normalized_quote, located_start_offset,

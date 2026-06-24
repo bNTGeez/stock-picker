@@ -1,0 +1,752 @@
+{
+  "company_name": "Five9",
+  "ticker": "FIVN",
+  "memo_date": "2026-06-20",
+  "research_verdict": "Research Further",
+  "investment_stance": "Lean Bullish",
+  "confidence": "Medium",
+  "category_scores": {
+    "business_quality": {
+      "score": 62,
+      "weight": 0.3,
+      "rationale": "Five9 is an established leader with over 3,000 customers and no customer concentration risk (no single customer over 10% of revenue), operating a recurring SaaS model with usage-based AI upside. Gross margin improved to 55% in FY2025 from 54%, and the company reached its first annual net income ($39.4 million) after two years of losses. However, the installed base business that drives most revenue growth is explicitly flagged as facing ongoing macroeconomic headwinds, and professional services carry structurally negative margins for larger customers, capping quality relative to best-in-class SaaS peers."
+    },
+    "risk_profile": {
+      "score": 48,
+      "weight": 0.2,
+      "rationale": "Customer concentration risk is low, but Annual Dollar-Based Retention Rate declined from 108% (FY2024) to 105% (FY2025), the company has executed two reductions-in-force in twelve months, and leadership is mid-transition under a CEO who joined in February 2026 and has withheld a forward strategic framework pending portfolio 'deep dives.' Competitive intensity from Genesys, NICE, Avaya, Cisco, and CRM/hyperscaler entrants adds further execution risk."
+    },
+    "expectations_gap": {
+      "score": 58,
+      "weight": 0.2,
+      "rationale": "Consensus is described as broadly skeptical given 10% FY2025 growth and macro headwinds to the installed base. The supplied evidence shows two underappreciated, more recent inflections: AI revenue growth accelerating from 49% to 68% YoY and subscription-specific dollar-based retention rising sequentially from 106% to 107%, both of which run counter to the deceleration narrative consensus appears anchored to."
+    },
+    "variant_perception": {
+      "score": 55,
+      "weight": 0.15,
+      "rationale": "The thesis that a shift from per-seat licensing to AI-consumption and fixed multi-year revenue commitments structurally expands Five9's monetizable surface area is grounded in management's own description of contract redesign and is corroborated by the recently-disclosed acceleration in AI revenue growth, but the scale of conversion is still small (AI is 13% of subscription revenue) and unproven over multiple quarters, limiting conviction."
+    },
+    "valuation": {
+      "score": 40,
+      "weight": 0.1,
+      "rationale": "No current market price was supplied, so no price-based margin of safety can be established in this memo. The evidence does show approximately $175 million of guided FY2026 free cash flow, a $724 million cash balance, and an active $350 million combined share repurchase capacity (the remaining $90 million of the original $150 million authorization plus a new $200 million authorization), which are constructive capital-return signals, but this category score is capped by the absence of price and consensus multiple data needed for a complete valuation assessment."
+    },
+    "catalyst": {
+      "score": 57,
+      "weight": 0.05,
+      "rationale": "Near-term catalysts include the H2 2026 revenue growth acceleration to double digits (per guidance), new AI products moving from beta to general availability 'in the next quarter or so,' continued execution of the $200 million buyback authorization, and the new CEO's promised reveal of a strategic/product-portfolio framework following the current 'deep dive' review."
+    }
+  },
+  "market_expectations": "Consensus notes indicate the market is broadly skeptical of Five9, anchored to FY2025 revenue growth decelerating to 10% (from 14% in FY2024), continuing macroeconomic headwinds to the installed base, and competitive pressure from Genesys, NICE, and CRM vendors. The market appears to extrapolate the FY2024-to-FY2025 decline in Annual Dollar-Based Retention Rate (108% to 105%) forward and to treat FY2026 guidance of roughly 10% revenue growth (a ~$1.26 billion midpoint) as a continuation of deceleration rather than the start of a recovery. Consensus also appears to be debating, rather than assuming, whether AI revenue growth and a newly appointed CEO (who joined in February 2026) can re-accelerate the business, treating both as unresolved questions.",
+  "observations": {
+    "observations": [
+      {
+        "statement": "FY2025 revenue growth decelerated to 10% from 14% in FY2024, but Five9 achieved its first full-year net income ($39.4 million) after two consecutive years of losses, alongside expanding gross and operating margins.",
+        "supporting_evidence": [
+          {
+            "source_type": "10-K",
+            "source_tier": 1,
+            "source_id": "Five9 FY2025 10-K Item 1",
+            "quote": "For the years ended December 31, 2025, 2024 and 2023, our revenue was $1,149.1 million, $1,041.9 million and $910.5 million, respectively, representing year-over-year growth of 10% and 14%, respectively.",
+            "normalized_quote": "For the years ended December 31, 2025, 2024 and 2023, our revenue was $1,149.1 million, $1,041.9 million and $910.5 million, respectively, representing year-over-year growth of 10% and 14%, respectively.",
+            "located_start_offset": 1934,
+            "located_end_offset": 2137,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "10-K",
+            "source_tier": 1,
+            "source_id": "Five9 FY2025 10-K Item 7",
+            "quote": "We had a net income of $39.4 million for the year ended December 31, 2025, compared to a net loss of $(12.8) million for the year ended December 31, 2024.",
+            "normalized_quote": "We had a net income of $39.4 million for the year ended December 31, 2025, compared to a net loss of $(12.8) million for the year ended December 31, 2024.",
+            "located_start_offset": 636,
+            "located_end_offset": 790,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "10-K",
+            "source_tier": 1,
+            "source_id": "Five9 FY2025 10-K Item 7",
+            "quote": "Operating income: 3% of revenue in 2025 vs operating loss of 5% in 2024.",
+            "normalized_quote": "Operating income: 3% of revenue in 2025 vs operating loss of 5% in 2024.",
+            "located_start_offset": 1740,
+            "located_end_offset": 1812,
+            "match_score": 1.0
+          }
+        ]
+      },
+      {
+        "statement": "Annual Dollar-Based Retention Rate declined from 108% in FY2024 to 105% in FY2025, reflecting macro headwinds to the installed base, but the more recent, subscription-specific DBR metric improved sequentially from 106% in Q4 2025 to 107% in Q1 2026.",
+        "supporting_evidence": [
+          {
+            "source_type": "10-K",
+            "source_tier": 1,
+            "source_id": "Five9 FY2025 10-K Item 7",
+            "quote": "Annual Dollar-Based Retention Rate was 105% for the twelve months ended December 31, 2025, compared to 108% for the twelve months ended December 31, 2024.",
+            "normalized_quote": "Annual Dollar-Based Retention Rate was 105% for the twelve months ended December 31, 2025, compared to 108% for the twelve months ended December 31, 2024.",
+            "located_start_offset": 791,
+            "located_end_offset": 945,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "we will transition our DBRR disclosure to LTM subscription DBR, which came in at 107% in Q1, compared to 106% in Q4 2025.",
+            "normalized_quote": "we will transition our DBRR disclosure to LTM subscription DBR, which came in at 107% in Q1, compared to 106% in Q4 2025.",
+            "located_start_offset": 13773,
+            "located_end_offset": 13894,
+            "match_score": 1.0
+          }
+        ]
+      },
+      {
+        "statement": "AI revenue growth has itself been accelerating quarter over quarter (49% YoY in Q4 2025 to 68% YoY in Q1 2026) even as it remains a small share of total subscription revenue (13%, up from 8% a year earlier).",
+        "supporting_evidence": [
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "the year-over-year growth rate accelerated from 49% in Q4 2025 to 68% in Q1 2026, primarily driven by our backlog ramping earlier than anticipated.",
+            "normalized_quote": "the year-over-year growth rate accelerated from 49% in Q4 2025 to 68% in Q1 2026, primarily driven by our backlog ramping earlier than anticipated.",
+            "located_start_offset": 13133,
+            "located_end_offset": 13280,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "Our AI revenue now represents approximately 13% of total subscription revenue, compared to approximately 8% a year ago.",
+            "normalized_quote": "Our AI revenue now represents approximately 13% of total subscription revenue, compared to approximately 8% a year ago.",
+            "located_start_offset": 13009,
+            "located_end_offset": 13128,
+            "match_score": 1.0
+          }
+        ]
+      },
+      {
+        "statement": "Margin expansion over the past year has coincided with two reductions-in-force (approximately 6% of headcount in August 2024 and approximately 4% in April 2025), with Adjusted EBITDA margin rising 470 basis points from 2024 to 2025 and continuing to expand in Q1 2026 (19% to 24% of revenue YoY).",
+        "supporting_evidence": [
+          {
+            "source_type": "10-K",
+            "source_tier": 1,
+            "source_id": "Five9 FY2025 10-K Item 7",
+            "quote": "In August 2024, we announced a reduction in force plan as part of our broader efforts to drive balanced, profitable growth. The 2024 Plan reduced our global full-time employees by approximately 6%.",
+            "normalized_quote": "In August 2024, we announced a reduction in force plan as part of our broader efforts to drive balanced, profitable growth. The 2024 Plan reduced our global full-time employees by approximately 6%.",
+            "located_start_offset": 0,
+            "located_end_offset": 197,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "10-K",
+            "source_tier": 1,
+            "source_id": "Five9 FY2025 10-K Item 7",
+            "quote": "On March 31, 2025, our Board of Directors approved a second reduction in force plan. On April 3, 2025, we commenced execution of the 2025 Plan, which resulted in the reduction of our global full-time employees by approximately 4%.",
+            "normalized_quote": "On March 31, 2025, our Board of Directors approved a second reduction in force plan. On April 3, 2025, we commenced execution of the 2025 Plan, which resulted in the reduction of our global full-time employees by approximately 4%.",
+            "located_start_offset": 198,
+            "located_end_offset": 428,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "This work, which was well underway before I joined, helped drive the 470 basis points increase in EBITDA margin from 2024 to 2025.",
+            "normalized_quote": "This work, which was well underway before I joined, helped drive the 470 basis points increase in EBITDA margin from 2024 to 2025.",
+            "located_start_offset": 4871,
+            "located_end_offset": 5001,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "Adjusted EBITDA was $74 million, or 24% of revenue, compared to $53 million, or 19% of revenue, in the same quarter last year.",
+            "normalized_quote": "Adjusted EBITDA was $74 million, or 24% of revenue, compared to $53 million, or 19% of revenue, in the same quarter last year.",
+            "located_start_offset": 14323,
+            "located_end_offset": 14449,
+            "match_score": 1.0
+          }
+        ]
+      },
+      {
+        "statement": "A new CEO took over as of this earnings call (his first as CEO, joining in February 2026) and is still mid-way through leadership changes and product-portfolio 'deep dives,' and management has explicitly declined to provide longer-range (2027) guidance until that review concludes.",
+        "supporting_evidence": [
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "This is my first full earnings call as CEO.",
+            "normalized_quote": "This is my first full earnings call as CEO.",
+            "located_start_offset": 3066,
+            "located_end_offset": 3109,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "I am leading a series of deep dives across the product portfolio to align investments with our long-term competitive priorities.",
+            "normalized_quote": "I am leading a series of deep dives across the product portfolio to align investments with our long-term competitive priorities.",
+            "located_start_offset": 5217,
+            "located_end_offset": 5345,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "On your 2027 question, we are not providing 2027 guidance today.",
+            "normalized_quote": "On your 2027 question, we are not providing 2027 guidance today.",
+            "located_start_offset": 35484,
+            "located_end_offset": 35548,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "We are in the middle of deep dives across the portfolio, and we have our new chief marketing and growth officer. We want to let that process play out before revisiting the longer-range framework.",
+            "normalized_quote": "We are in the middle of deep dives across the portfolio, and we have our new chief marketing and growth officer. We want to let that process play out before revisiting the longer-range framework.",
+            "located_start_offset": 35676,
+            "located_end_offset": 35871,
+            "match_score": 1.0
+          }
+        ]
+      },
+      {
+        "statement": "Management describes a shift in commercial model away from per-seat licensing toward AI-consumption pricing and fixed multi-year revenue commitments, framed as expanding the monetizable surface area as labor budgets are reallocated toward software.",
+        "supporting_evidence": [
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "Our path to success is no longer about simply selling seats. Instead, it is about selling a complete solution based on capabilities and consumption.",
+            "normalized_quote": "Our path to success is no longer about simply selling seats. Instead, it is about selling a complete solution based on capabilities and consumption.",
+            "located_start_offset": 8576,
+            "located_end_offset": 8724,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "We have started to transition with all our new logos, and with existing customers as they renew, to more of a fixed revenue commitment model. They are committing to a revenue number.",
+            "normalized_quote": "We have started to transition with all our new logos, and with existing customers as they renew, to more of a fixed revenue commitment model. They are committing to a revenue number.",
+            "located_start_offset": 34108,
+            "located_end_offset": 34290,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "as seats potentially compress over time, customers get the option to fill that committed revenue with our AI tools and others.",
+            "normalized_quote": "as seats potentially compress over time, customers get the option to fill that committed revenue with our AI tools and others.",
+            "located_start_offset": 34356,
+            "located_end_offset": 34482,
+            "match_score": 1.0
+          }
+        ]
+      },
+      {
+        "statement": "FY2026 guidance implies a back-half-loaded acceleration to double-digit revenue growth that management says is funded almost entirely by already-contracted backlog rather than new bookings: of the roughly $80 million of incremental H2 revenue needed, about two-thirds is expected from already-stabilizing dollar-based retention and the remaining third from already-won backlog.",
+        "supporting_evidence": [
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "For the second half, we continue to expect total revenue growth to accelerate to double digits driven by our backlog of both new logo and installed base bookings.",
+            "normalized_quote": "For the second half, we continue to expect total revenue growth to accelerate to double digits driven by our backlog of both new logo and installed base bookings.",
+            "located_start_offset": 15452,
+            "located_end_offset": 15614,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "If you break down our guide for the last three remaining quarters, it implies we need to get about $80 million of incremental recurring revenue.",
+            "normalized_quote": "If you break down our guide for the last three remaining quarters, it implies we need to get about $80 million of incremental recurring revenue.",
+            "located_start_offset": 36247,
+            "located_end_offset": 36391,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "Roughly two-thirds of that will be coming from our DBR, which we said will stabilize in the second quarter, plus or minus one percentage point, and inflect upward in the second half.",
+            "normalized_quote": "Roughly two-thirds of that will be coming from our DBR, which we said will stabilize in the second quarter, plus or minus one percentage point, and inflect upward in the second half.",
+            "located_start_offset": 36392,
+            "located_end_offset": 36574,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "The remaining third is coming from new logos\u2014but all from our backlog that is converting to revenue.",
+            "normalized_quote": "The remaining third is coming from new logos\u2014but all from our backlog that is converting to revenue.",
+            "located_start_offset": 36575,
+            "located_end_offset": 36675,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "There is essentially no dependency on new-logo go-gets for the rest of the year.",
+            "normalized_quote": "There is essentially no dependency on new-logo go-gets for the rest of the year.",
+            "located_start_offset": 36748,
+            "located_end_offset": 36828,
+            "match_score": 1.0
+          }
+        ]
+      },
+      {
+        "statement": "Five9 increased capital returns to shareholders (completing the remaining $90 million of a $150 million buyback authorization plus a new $200 million authorization) while maintaining a $724 million cash position and guiding to approximately $175 million of FY2026 free cash flow, though Q1 2026 cash-flow margins were boosted by a one-time, non-recurring vendor discount.",
+        "supporting_evidence": [
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "we intend to complete the remaining amount of our $150 million share repurchase authorization by the end of Q3. In addition, our board has authorized an additional $200 million share repurchase program.",
+            "normalized_quote": "we intend to complete the remaining amount of our $150 million share repurchase authorization by the end of Q3. In addition, our board has authorized an additional $200 million share repurchase program.",
+            "located_start_offset": 10562,
+            "located_end_offset": 10764,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "we ended the quarter with $724 million in cash, cash equivalents, and short-term investments.",
+            "normalized_quote": "we ended the quarter with $724 million in cash, cash equivalents, and short-term investments.",
+            "located_start_offset": 14839,
+            "located_end_offset": 14932,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "we continue to anticipate annual adjusted EBITDA margin to exceed 24% and annual free cash flow to be approximately $175 million.",
+            "normalized_quote": "we continue to anticipate annual adjusted EBITDA margin to exceed 24% and annual free cash flow to be approximately $175 million.",
+            "located_start_offset": 16080,
+            "located_end_offset": 16209,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "These profitability and cash flow margins benefited by slightly more than one percentage point in the first quarter from a one-time discount negotiated with a key vendor that we do not expect to recur in future periods.",
+            "normalized_quote": "These profitability and cash flow margins benefited by slightly more than one percentage point in the first quarter from a one-time discount negotiated with a key vendor that we do not expect to recur in future periods.",
+            "located_start_offset": 14585,
+            "located_end_offset": 14804,
+            "match_score": 1.0
+          }
+        ]
+      }
+    ]
+  },
+  "variant_hypothesis": "The bear narrative that consensus is anchored to relies primarily on a lagging, full-year metric: the FY2025 annual revenue growth rate (10%) and the FY2024-to-FY2025 decline in the full-year Annual Dollar-Based Retention Rate (108% to 105%). The supplied Q1 2026 transcript evidence shows two more recent, higher-frequency indicators moving in the opposite direction: subscription-specific dollar-based retention has already inflected sequentially, rising from 106% in Q4 2025 to 107% in Q1 2026, and AI revenue growth has itself been accelerating quarter over quarter, from 49% YoY in Q4 2025 to 68% YoY in Q1 2026. Management also describes the FY2026 back-half growth acceleration to double digits as funded almost entirely by already-contracted backlog rather than new sales execution. If these more recent trends continue, the 'installed base headwind / decelerating growth' framing that consensus is anchored to may be describing where the business was rather than where it is heading, while the underlying mix-shift toward AI consumption revenue and fixed multi-year revenue commitments may be the leading indicator of a reacceleration that is already substantially funded by backlog on the books today.",
+  "why_consensus_may_be_wrong": "Consensus skepticism is well supported by backward-looking, audited data: revenue growth has decelerated for two consecutive years (14% to 10%) and the full-year retention metric has declined for the same period. However, the observations on subscription-specific DBR inflecting sequentially and AI revenue growth accelerating quarter over quarter are also backward-looking, reported results as of Q1 2026, not merely guidance. Combined with management's disclosure that roughly two-thirds of the $80 million of incremental H2 2026 revenue needed to hit guidance is expected to come from the already-stabilizing DBR base and the remaining third from backlog that is already won (explicitly described as having 'essentially no dependency on new-logo go-gets'), the case for re-acceleration rests on a narrower, lower-risk set of assumptions than a typical 'hope for new bookings' guide. This connects the observations to the variant hypothesis: consensus may be weighting the slower-moving, lagging full-year metrics more heavily than the faster-moving, more recent quarterly inflections.",
+  "adversarial_research": {
+    "bull_case": "The fundamentals are inflecting on a more recent, higher-frequency basis than the headline annual numbers suggest: subscription DBR has already turned up sequentially (106% to 107%), AI revenue growth is itself accelerating (49% to 68% YoY) off a backlog converting earlier than expected, and the FY2026 back-half guidance is funded mostly by contracted backlog rather than new sales execution. Profitability has been achieved, EBITDA margin has expanded 470bps year-over-year, free cash flow guidance of roughly $175 million supports an aggressive $290 million combined buyback program, and management is shifting the commercial model toward consumption and multi-year fixed revenue commitments that could expand the monetizable surface area as AI reallocates labor budgets toward software.",
+    "bear_case": "Revenue growth has decelerated for two straight years to a 10% FY2025 rate, and the full-year Annual Dollar-Based Retention Rate fell from 108% to 105%, with management explicitly stating that installed-base macroeconomic headwinds are expected to continue. Margin gains have leaned on two reductions-in-force in twelve months, which may not be repeatable without further headcount cuts. AI revenue, despite a fast growth rate, is still only 13% of subscription revenue, so its blended financial impact is limited. The FY2026 H2 acceleration depends on management's own characterization of backlog conversion timing, which is forward-looking and unverified by historical data in the supplied excerpts. The company also faces a newly arrived CEO with an unproven track record at Five9 who has withheld a multi-year strategic framework, and intensifying competition from Genesys, NICE, Avaya, Cisco, and CRM/hyperscaler entrants.",
+    "key_disagreement": "Whether the AI/consumption mix-shift and the sequential DBR and AI-growth inflections represent durable, structurally embedded momentum in the business, or whether they reflect a temporary combination of favorable backlog-timing comps and discretionary capital-return support layered on top of a still-decelerating, competitively pressured core business led by an unproven, recently arrived management team.",
+    "evidence_for_variant_view": [
+      {
+        "source_type": "earnings_call_transcript",
+        "source_tier": 2,
+        "source_id": "Five9 Q1 2026 Earnings Call",
+        "quote": "the year-over-year growth rate accelerated from 49% in Q4 2025 to 68% in Q1 2026, primarily driven by our backlog ramping earlier than anticipated.",
+        "normalized_quote": "the year-over-year growth rate accelerated from 49% in Q4 2025 to 68% in Q1 2026, primarily driven by our backlog ramping earlier than anticipated.",
+        "located_start_offset": 13133,
+        "located_end_offset": 13280,
+        "match_score": 1.0
+      },
+      {
+        "source_type": "earnings_call_transcript",
+        "source_tier": 2,
+        "source_id": "Five9 Q1 2026 Earnings Call",
+        "quote": "we will transition our DBRR disclosure to LTM subscription DBR, which came in at 107% in Q1, compared to 106% in Q4 2025.",
+        "normalized_quote": "we will transition our DBRR disclosure to LTM subscription DBR, which came in at 107% in Q1, compared to 106% in Q4 2025.",
+        "located_start_offset": 13773,
+        "located_end_offset": 13894,
+        "match_score": 1.0
+      },
+      {
+        "source_type": "earnings_call_transcript",
+        "source_tier": 2,
+        "source_id": "Five9 Q1 2026 Earnings Call",
+        "quote": "There is essentially no dependency on new-logo go-gets for the rest of the year.",
+        "normalized_quote": "There is essentially no dependency on new-logo go-gets for the rest of the year.",
+        "located_start_offset": 36748,
+        "located_end_offset": 36828,
+        "match_score": 1.0
+      }
+    ],
+    "evidence_against_variant_view": [
+      {
+        "source_type": "10-K",
+        "source_tier": 1,
+        "source_id": "Five9 FY2025 10-K Item 1",
+        "quote": "For the years ended December 31, 2025, 2024 and 2023, our revenue was $1,149.1 million, $1,041.9 million and $910.5 million, respectively, representing year-over-year growth of 10% and 14%, respectively.",
+        "normalized_quote": "For the years ended December 31, 2025, 2024 and 2023, our revenue was $1,149.1 million, $1,041.9 million and $910.5 million, respectively, representing year-over-year growth of 10% and 14%, respectively.",
+        "located_start_offset": 1934,
+        "located_end_offset": 2137,
+        "match_score": 1.0
+      },
+      {
+        "source_type": "10-K",
+        "source_tier": 1,
+        "source_id": "Five9 FY2025 10-K Item 7",
+        "quote": "Annual Dollar-Based Retention Rate was 105% for the twelve months ended December 31, 2025, compared to 108% for the twelve months ended December 31, 2024.",
+        "normalized_quote": "Annual Dollar-Based Retention Rate was 105% for the twelve months ended December 31, 2025, compared to 108% for the twelve months ended December 31, 2024.",
+        "located_start_offset": 791,
+        "located_end_offset": 945,
+        "match_score": 1.0
+      },
+      {
+        "source_type": "10-K",
+        "source_tier": 1,
+        "source_id": "Five9 FY2025 10-K Item 1A",
+        "quote": "Our installed base business, which contributes a significant portion of our annual revenue growth, continues to experience macroeconomic challenges.",
+        "normalized_quote": "Our installed base business, which contributes a significant portion of our annual revenue growth, continues to experience macroeconomic challenges.",
+        "located_start_offset": 76,
+        "located_end_offset": 224,
+        "match_score": 1.0
+      },
+      {
+        "source_type": "earnings_call_transcript",
+        "source_tier": 2,
+        "source_id": "Five9 Q1 2026 Earnings Call",
+        "quote": "AI is a fast-growing part of our business but still small\u201413% of total subscription revenue.",
+        "normalized_quote": "AI is a fast-growing part of our business but still small\u201413% of total subscription revenue.",
+        "located_start_offset": 37335,
+        "located_end_offset": 37427,
+        "match_score": 1.0
+      }
+    ],
+    "rebuttal": "The full-year Annual Dollar-Based Retention Rate is a slower-moving, blended metric (subscription plus telecom) that lags the more current subscription-specific DBR Five9 newly disclosed, which has already shown a sequential uptick. The H2 2026 guidance bridge is not purely a forward promise: roughly two-thirds of the needed incremental revenue is explicitly tied to a retention metric management says has already stabilized, and the remaining third is contracted backlog rather than unsold pipeline, which is a lower-risk forecast structure than a typical 'hope for new bookings' guide. That said, this does not eliminate execution risk on backlog conversion timing or on the durability of the AI-revenue acceleration, and it does not resolve the open question of the new CEO's execution track record.",
+    "disconfirming_evidence": [
+      "If subscription DBR fails to inflect above the 106-107% range in H2 2026 as management guided, or instead declines, the retention-inflection component of the variant hypothesis weakens.",
+      "If AI revenue growth decelerates again in coming quarters as it did before accelerating from 49% to 68% YoY, given management's own statement that AI revenue is expected to 'fluctuate quarter to quarter,' the consumption-mix-shift narrative is undermined.",
+      "If Five9 misses FY2026 revenue or EBITDA guidance despite management's statement of 'essentially no dependency on new-logo go-gets' for H2, it would indicate execution or delivery risk beyond bookings.",
+      "If a third reduction-in-force or further deterioration in installed-base macro conditions occurs, it would support the bear case that current margin gains are not yet structurally durable."
+    ],
+    "final_synthesis": "The supplied evidence supports a credible, evidence-grounded variant view: more recent, higher-frequency indicators (sequential subscription DBR improvement, AI revenue growth acceleration, a backlog-funded H2 guidance bridge) point toward an inflection that the consensus skepticism, anchored to slower-moving full-year metrics, may not yet fully reflect. However, the thesis is not yet a high-conviction one: it depends partly on management's own characterization of backlog ramp timing, the new CEO's strategic framework remains unpublished, and no market price was supplied to assess whether this inflection is already priced in. The evidence supports continued research rather than a high-conviction call in either direction."
+  },
+  "unknowns": {
+    "unknowns": [
+      "No current market price was supplied, so it is unknown how much of the AI-acceleration / DBR-inflection narrative versus the deceleration narrative is already reflected in Five9's valuation.",
+      "The variant hypothesis's reliance on H2 2026 backlog conversion depends substantially on management's own characterization of customer ramp and deployment schedules, which are forward-looking statements; this is an explicit limitation given the instruction to prioritize backward-looking evidence.",
+      "The specific revenue contribution, contract economics (e.g., average contract value, renewal rate), and bookings mix of the new fixed-revenue-commitment, multi-year contract structure are not quantified in the supplied excerpts.",
+      "The new CEO's promised product-portfolio 'deep dive' findings and any related multi-year strategic framework (including a 2027 outlook) had not yet been published as of the supplied transcript.",
+      "The durability of Q1 2026 margin and free-cash-flow benefits beyond the disclosed one-time vendor discount, and the magnitude of any normalized (ex-discount) margin level, is not detailed in the supplied excerpts.",
+      "Full-year FY2025 revenue mix detail (license/seat versus AI versus telephony as a percent of total revenue) is not broken out in the supplied 10-K excerpts beyond the Q1 2026 subscription-level disclosure."
+    ]
+  },
+  "top_risks": [
+    "Full-year Annual Dollar-Based Retention Rate has declined two years running (108% to 105%), and management has stated that installed-base macroeconomic headwinds are expected to continue to adversely affect revenue.",
+    "The FY2026 back-half revenue acceleration relies substantially on management's own forward characterization of backlog ramp and deployment timing, which could prove less favorable than disclosed.",
+    "A newly appointed CEO (as of February 2026) is still completing leadership changes and a product-portfolio review, with no published multi-year strategic framework as of the supplied transcript.",
+    "Competitive intensity is high and rising, including from established cloud contact-center vendors (Genesys, NICE), legacy vendors (Avaya, Cisco), hyperscaler/developer-oriented entrants (Amazon, Twilio, Microsoft), and CRM vendors increasingly adding native AI contact-center features.",
+    "AI revenue, while fast-growing, remains a small share (13%) of subscription revenue, and management has explicitly flagged that its quarter-to-quarter growth rate is expected to fluctuate due to lumpy backlog ramp schedules.",
+    "Recent margin expansion has been achieved partly through two reductions-in-force within twelve months, which may not be repeatable without further headcount actions and could indicate underlying demand softness rather than pure efficiency gains.",
+    "No current market price was supplied for this memo, so no valuation-based margin of safety has been established."
+  ],
+  "valuation_range": {
+    "bear": {
+      "label": "Bear",
+      "assumptions": [
+        "Installed-base macroeconomic headwinds persist and subscription DBR fails to sustain or extend its Q1 2026 inflection above 107% through H2 2026",
+        "AI revenue growth decelerates back toward or below the guided 40% full-year floor as backlog ramps prove lumpier or slower than disclosed",
+        "Competitive pressure from Genesys, NICE, and CRM/hyperscaler entrants compresses seat pricing faster than AI/consumption revenue can offset it"
+      ],
+      "implied_outcome": "Total revenue growth stalls near or below the high single digits, FY2026 guidance is missed or only narrowly achieved, and further margin gains become harder to source without additional reductions-in-force.",
+      "supporting_evidence": [
+        {
+          "source_type": "10-K",
+          "source_tier": 1,
+          "source_id": "Five9 FY2025 10-K Item 1A",
+          "quote": "Our installed base business, which contributes a significant portion of our annual revenue growth, continues to experience macroeconomic challenges.",
+          "normalized_quote": "Our installed base business, which contributes a significant portion of our annual revenue growth, continues to experience macroeconomic challenges.",
+          "located_start_offset": 76,
+          "located_end_offset": 224,
+          "match_score": 1.0
+        },
+        {
+          "source_type": "10-K",
+          "source_tier": 1,
+          "source_id": "Five9 FY2025 10-K Item 7",
+          "quote": "we expect that macroeconomic challenges will continue to have an adverse impact on our revenue in future periods.",
+          "normalized_quote": "we expect that macroeconomic challenges will continue to have an adverse impact on our revenue in future periods.",
+          "located_start_offset": 1913,
+          "located_end_offset": 2026,
+          "match_score": 1.0
+        },
+        {
+          "source_type": "10-K",
+          "source_tier": 1,
+          "source_id": "Five9 FY2025 10-K Item 1",
+          "quote": "We currently compete with large legacy vendors such as Avaya and Cisco. We compete with cloud contact center vendors such as Genesys and NICE. Amazon, Twilio, and Microsoft have introduced developer-oriented solutions.",
+          "normalized_quote": "We currently compete with large legacy vendors such as Avaya and Cisco. We compete with cloud contact center vendors such as Genesys and NICE. Amazon, Twilio, and Microsoft have introduced developer-oriented solutions.",
+          "located_start_offset": 2993,
+          "located_end_offset": 3211,
+          "match_score": 1.0
+        }
+      ]
+    },
+    "base": {
+      "label": "Base",
+      "assumptions": [
+        "FY2026 guidance is achieved substantially as outlined: revenue near a $1.26 billion midpoint, adjusted EBITDA margin exceeding 24%, and approximately $175 million of free cash flow",
+        "Subscription DBR stabilizes in Q2 2026 within plus or minus one percentage point of Q1 levels and inflects modestly in H2 2026 as guided",
+        "AI revenue growth moderates from the 68% Q1 2026 pace but still exceeds the guided 40% floor for the full year, continuing to grow as a share of subscription revenue"
+      ],
+      "implied_outcome": "Five9 delivers the back-half-loaded double-digit revenue growth acceleration management has guided to, funded primarily by already-contracted backlog rather than new bookings, while sustaining recently achieved profitability and continuing its buyback program.",
+      "supporting_evidence": [
+        {
+          "source_type": "earnings_call_transcript",
+          "source_tier": 2,
+          "source_id": "Five9 Q1 2026 Earnings Call",
+          "quote": "we are guiding total revenue to a midpoint of $1.26 billion with a range of $1.254 billion to $1.266 billion, up from our initial midpoint guidance of $1.254 billion.",
+          "normalized_quote": "we are guiding total revenue to a midpoint of $1.26 billion with a range of $1.254 billion to $1.266 billion, up from our initial midpoint guidance of $1.254 billion.",
+          "located_start_offset": 15715,
+          "located_end_offset": 15881,
+          "match_score": 1.0
+        },
+        {
+          "source_type": "earnings_call_transcript",
+          "source_tier": 2,
+          "source_id": "Five9 Q1 2026 Earnings Call",
+          "quote": "we continue to anticipate annual adjusted EBITDA margin to exceed 24% and annual free cash flow to be approximately $175 million.",
+          "normalized_quote": "we continue to anticipate annual adjusted EBITDA margin to exceed 24% and annual free cash flow to be approximately $175 million.",
+          "located_start_offset": 16080,
+          "located_end_offset": 16209,
+          "match_score": 1.0
+        },
+        {
+          "source_type": "earnings_call_transcript",
+          "source_tier": 2,
+          "source_id": "Five9 Q1 2026 Earnings Call",
+          "quote": "There is essentially no dependency on new-logo go-gets for the rest of the year.",
+          "normalized_quote": "There is essentially no dependency on new-logo go-gets for the rest of the year.",
+          "located_start_offset": 36748,
+          "located_end_offset": 36828,
+          "match_score": 1.0
+        }
+      ]
+    },
+    "bull": {
+      "label": "Bull",
+      "assumptions": [
+        "AI revenue growth re-accelerates toward or holds near the 68% Q1 2026 pace through the year as more customers transition to the fixed-revenue-commitment consumption model",
+        "Subscription DBR continues climbing beyond 107% as installed-base macroeconomic headwinds ease faster than guided",
+        "The new CEO's product-portfolio 'deep dive' work and organizational redesign produce faster operating leverage and clearer go-to-market execution than currently guided"
+      ],
+      "implied_outcome": "Revenue growth re-accelerates meaningfully above the guided ~10% FY2026 pace, AI/consumption revenue becomes a larger share of the business faster than guided, and margin expansion continues, supporting a case that the post-2025 turnaround is structural rather than cyclical.",
+      "supporting_evidence": [
+        {
+          "source_type": "earnings_call_transcript",
+          "source_tier": 2,
+          "source_id": "Five9 Q1 2026 Earnings Call",
+          "quote": "Our path to success is no longer about simply selling seats. Instead, it is about selling a complete solution based on capabilities and consumption.",
+          "normalized_quote": "Our path to success is no longer about simply selling seats. Instead, it is about selling a complete solution based on capabilities and consumption.",
+          "located_start_offset": 8576,
+          "located_end_offset": 8724,
+          "match_score": 1.0
+        },
+        {
+          "source_type": "earnings_call_transcript",
+          "source_tier": 2,
+          "source_id": "Five9 Q1 2026 Earnings Call",
+          "quote": "We have seen strong traction out of the gate. Customers have great interest in buying into that motion. Often they are making three- and five-year decisions.",
+          "normalized_quote": "We have seen strong traction out of the gate. Customers have great interest in buying into that motion. Often they are making three- and five-year decisions.",
+          "located_start_offset": 35073,
+          "located_end_offset": 35230,
+          "match_score": 1.0
+        },
+        {
+          "source_type": "earnings_call_transcript",
+          "source_tier": 2,
+          "source_id": "Five9 Q1 2026 Earnings Call",
+          "quote": "The TAM for CCaaS plus support AI is nearly 2x the displacement of seats that will happen, and so we now get to play in a much larger market as we evolve and build into this platform.",
+          "normalized_quote": "The TAM for CCaaS plus support AI is nearly 2x the displacement of seats that will happen, and so we now get to play in a much larger market as we evolve and build into this platform.",
+          "located_start_offset": 19870,
+          "located_end_offset": 20053,
+          "match_score": 1.0
+        }
+      ]
+    }
+  },
+  "reverse_dcf_expectations": null,
+  "monitoring_rules": {
+    "green_flags": [
+      {
+        "trigger": "Subscription DBR rises above 107% in Q2 or Q3 2026 disclosures.",
+        "rationale": "Would confirm the sequential retention inflection management guided to and directly support the variant hypothesis that installed-base headwinds are easing.",
+        "evidence": [
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "we will transition our DBRR disclosure to LTM subscription DBR, which came in at 107% in Q1, compared to 106% in Q4 2025.",
+            "normalized_quote": "we will transition our DBRR disclosure to LTM subscription DBR, which came in at 107% in Q1, compared to 106% in Q4 2025.",
+            "located_start_offset": 13773,
+            "located_end_offset": 13894,
+            "match_score": 1.0
+          }
+        ]
+      },
+      {
+        "trigger": "Full-year 2026 AI revenue growth is reported at or above the 68% Q1 2026 pace, or comfortably above the guided 40% floor.",
+        "rationale": "Would support continuation of the AI/consumption mix-shift thesis rather than a one-quarter timing benefit.",
+        "evidence": [
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "the year-over-year growth rate accelerated from 49% in Q4 2025 to 68% in Q1 2026, primarily driven by our backlog ramping earlier than anticipated.",
+            "normalized_quote": "the year-over-year growth rate accelerated from 49% in Q4 2025 to 68% in Q1 2026, primarily driven by our backlog ramping earlier than anticipated.",
+            "located_start_offset": 13133,
+            "located_end_offset": 13280,
+            "match_score": 1.0
+          }
+        ]
+      },
+      {
+        "trigger": "Quarterly revenue growth accelerates into double digits in H2 2026 in line with guidance, without a corresponding guidance cut at the Q2 or Q3 earnings call.",
+        "rationale": "Would confirm that the backlog-funded H2 bridge described by management is converting to revenue as described.",
+        "evidence": [
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "For the second half, we continue to expect total revenue growth to accelerate to double digits driven by our backlog of both new logo and installed base bookings.",
+            "normalized_quote": "For the second half, we continue to expect total revenue growth to accelerate to double digits driven by our backlog of both new logo and installed base bookings.",
+            "located_start_offset": 15452,
+            "located_end_offset": 15614,
+            "match_score": 1.0
+          }
+        ]
+      }
+    ],
+    "yellow_flags": [
+      {
+        "trigger": "AI revenue growth decelerates sequentially for two consecutive quarters.",
+        "rationale": "Would suggest the Q1 2026 acceleration to 68% was a one-time backlog-timing benefit rather than a durable trend, consistent with management's own caution that AI growth will fluctuate.",
+        "evidence": [
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "AI revenue growth is expected to fluctuate quarter to quarter given varying ramp schedules, with full year 2026 growth anticipated to exceed 40% year over year.",
+            "normalized_quote": "AI revenue growth is expected to fluctuate quarter to quarter given varying ramp schedules, with full year 2026 growth anticipated to exceed 40% year over year.",
+            "located_start_offset": 13386,
+            "located_end_offset": 13546,
+            "match_score": 1.0
+          }
+        ]
+      },
+      {
+        "trigger": "Management again withholds multi-year (e.g., 2027) guidance beyond the current fiscal year at the next earnings call.",
+        "rationale": "Would signal continued strategic uncertainty under the new CEO and a longer timeline before the variant hypothesis can be independently verified.",
+        "evidence": [
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "On your 2027 question, we are not providing 2027 guidance today.",
+            "normalized_quote": "On your 2027 question, we are not providing 2027 guidance today.",
+            "located_start_offset": 35484,
+            "located_end_offset": 35548,
+            "match_score": 1.0
+          }
+        ]
+      },
+      {
+        "trigger": "Gross or EBITDA margin gains stall or reverse without a clearly stated one-time cause.",
+        "rationale": "Would suggest the reduction-in-force-driven cost savings are running out without being replaced by structural efficiency gains.",
+        "evidence": [
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "These profitability and cash flow margins benefited by slightly more than one percentage point in the first quarter from a one-time discount negotiated with a key vendor that we do not expect to recur in future periods.",
+            "normalized_quote": "These profitability and cash flow margins benefited by slightly more than one percentage point in the first quarter from a one-time discount negotiated with a key vendor that we do not expect to recur in future periods.",
+            "located_start_offset": 14585,
+            "located_end_offset": 14804,
+            "match_score": 1.0
+          }
+        ]
+      }
+    ],
+    "red_flags": [
+      {
+        "trigger": "Subscription or full-year dollar-based retention declines below 105% in any subsequent quarterly disclosure.",
+        "rationale": "Would directly contradict the retention-inflection component of the variant hypothesis.",
+        "evidence": [
+          {
+            "source_type": "10-K",
+            "source_tier": 1,
+            "source_id": "Five9 FY2025 10-K Item 7",
+            "quote": "Annual Dollar-Based Retention Rate was 105% for the twelve months ended December 31, 2025, compared to 108% for the twelve months ended December 31, 2024.",
+            "normalized_quote": "Annual Dollar-Based Retention Rate was 105% for the twelve months ended December 31, 2025, compared to 108% for the twelve months ended December 31, 2024.",
+            "located_start_offset": 791,
+            "located_end_offset": 945,
+            "match_score": 1.0
+          }
+        ]
+      },
+      {
+        "trigger": "FY2026 revenue or adjusted EBITDA guidance is cut at the Q2 or Q3 2026 earnings call.",
+        "rationale": "Would indicate the back-half acceleration management described as already backlog-funded is not converting to revenue as disclosed.",
+        "evidence": [
+          {
+            "source_type": "earnings_call_transcript",
+            "source_tier": 2,
+            "source_id": "Five9 Q1 2026 Earnings Call",
+            "quote": "we are guiding total revenue to a midpoint of $1.26 billion with a range of $1.254 billion to $1.266 billion, up from our initial midpoint guidance of $1.254 billion.",
+            "normalized_quote": "we are guiding total revenue to a midpoint of $1.26 billion with a range of $1.254 billion to $1.266 billion, up from our initial midpoint guidance of $1.254 billion.",
+            "located_start_offset": 15715,
+            "located_end_offset": 15881,
+            "match_score": 1.0
+          }
+        ]
+      },
+      {
+        "trigger": "A third reduction-in-force, or an unplanned senior leadership departure beyond the disclosed CMO hire, is announced.",
+        "rationale": "Would suggest deeper operational or strategic instability following the CEO transition than currently disclosed.",
+        "evidence": [
+          {
+            "source_type": "10-K",
+            "source_tier": 1,
+            "source_id": "Five9 FY2025 10-K Item 7",
+            "quote": "In August 2024, we announced a reduction in force plan as part of our broader efforts to drive balanced, profitable growth. The 2024 Plan reduced our global full-time employees by approximately 6%.",
+            "normalized_quote": "In August 2024, we announced a reduction in force plan as part of our broader efforts to drive balanced, profitable growth. The 2024 Plan reduced our global full-time employees by approximately 6%.",
+            "located_start_offset": 0,
+            "located_end_offset": 197,
+            "match_score": 1.0
+          },
+          {
+            "source_type": "10-K",
+            "source_tier": 1,
+            "source_id": "Five9 FY2025 10-K Item 7",
+            "quote": "On March 31, 2025, our Board of Directors approved a second reduction in force plan. On April 3, 2025, we commenced execution of the 2025 Plan, which resulted in the reduction of our global full-time employees by approximately 4%.",
+            "normalized_quote": "On March 31, 2025, our Board of Directors approved a second reduction in force plan. On April 3, 2025, we commenced execution of the 2025 Plan, which resulted in the reduction of our global full-time employees by approximately 4%.",
+            "located_start_offset": 198,
+            "located_end_offset": 428,
+            "match_score": 1.0
+          }
+        ]
+      }
+    ]
+  },
+  "recommended_next_step": "Obtain a current market price and consensus sell-side estimates to complete the valuation category and a reverse DCF analysis, since this memo was prepared without market price data. Track the Q2 2026 earnings release specifically for: (1) whether subscription DBR holds at or above 107%, (2) whether AI revenue growth decelerates or holds near the Q1 2026 pace, and (3) whether the new CEO publishes the promised product-portfolio strategic framework and any longer-range guidance. Revisit the research verdict once these three data points and a market price are available."
+}
